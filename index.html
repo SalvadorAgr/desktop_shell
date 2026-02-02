@@ -134,16 +134,27 @@
             border-radius: 10px;
         }
 
-        #splitview-divider {
-            display: none;
-        }
-
-        .splitview-active #splitview-divider {
-            display: block;
-        }
-
         #splitview-trigger {
             cursor: pointer;
+        }
+
+        .canvas-overlay-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+            z-index: 15;
+            pointer-events: none;
+        }
+
+        .canvas-overlay-svg * {
+            pointer-events: auto;
+        }
+
+        #splitview-divider {
+            cursor: col-resize;
         }
     </style>
 </head>
@@ -233,87 +244,7 @@
                     preserveAspectRatio="none">
                     <g clip-path="url(#clip0_595_14217)">
                         <path id="main-canvas-path" d="" fill="#0A0A0A" />
-
-                        <!-- SplitView Separator (Elite Transparency) -->
-                        <g id="splitview-divider" transform="translate(614.5, 1)">
-                            <rect x="1.5" y="289.5" width="4" height="50" rx="2" fill="#999999" />
-                        </g>
-
-                        <g id="dock-elements">
-                            <line x1="539.607" y1="633.107" x2="539.607" y2="652.893"
-                                stroke="url(#paint0_linear_595_14217)" stroke-width="0.214453" stroke-linecap="round" />
-
-                            <!-- First dock icon group (SplitView Trigger) -->
-                            <g class="dock-icon" id="splitview-trigger">
-                                <rect class="dock-icon-area" x="555" y="628" width="30" height="30" />
-                                <path
-                                    d="M569.214 648.5H566.982C566.242 648.5 565.643 647.9 565.643 647.161V639.125C565.643 638.385 566.242 637.786 566.982 637.786H569.214"
-                                    stroke="#D1D1D1" stroke-width="0.714286" stroke-linecap="round" />
-                                <path
-                                    d="M572.071 648.5H574.304C575.043 648.5 575.643 647.9 575.643 647.161V639.125C575.643 638.385 575.043 637.786 574.304 637.786H572.071"
-                                    stroke="#D1D1D1" stroke-width="0.714286" stroke-linecap="round" />
-                                <path d="M570.643 636V650.286" stroke="#D1D1D1" stroke-width="0.714286"
-                                    stroke-linecap="round" />
-                            </g>
-
-                            <line x1="602.607" y1="633.107" x2="602.607" y2="652.893"
-                                stroke="url(#paint1_linear_595_14217)" stroke-width="0.214453" stroke-linecap="round" />
-
-                            <!-- Second dock icon group -->
-                            <g class="dock-icon">
-                                <rect class="dock-icon-area" x="610" y="628" width="30" height="30" />
-                                <path
-                                    d="M620.25 643.349C620.25 642.397 620.25 641.921 620.456 641.503C620.662 641.084 621.048 640.775 621.821 640.155L622.571 639.554C623.969 638.435 624.668 637.875 625.5 637.875C626.332 637.875 627.031 638.435 628.429 639.554L629.179 640.155C629.952 640.775 630.338 641.084 630.544 641.503C630.75 641.921 630.75 642.397 630.75 643.349V646.321C630.75 647.643 630.75 648.304 630.311 648.714C629.871 649.125 629.164 649.125 627.75 649.125H623.25C621.836 649.125 621.129 649.125 620.689 648.714C620.25 648.304 620.25 647.643 620.25 646.321V643.349Z"
-                                    stroke="#D1D1D1" stroke-width="0.850003" />
-                                <path
-                                    d="M627 649.125V646.048C627 645.676 626.699 645.375 626.327 645.375H624.673C624.301 645.375 624 645.676 624 646.048V649.125"
-                                    stroke="#D1D1D1" stroke-width="0.850003" stroke-linecap="round"
-                                    stroke-linejoin="round" />
-                            </g>
-
-                            <line x1="649.607" y1="633.107" x2="649.607" y2="652.893"
-                                stroke="url(#paint2_linear_595_14217)" stroke-width="0.214453" stroke-linecap="round" />
-
-                            <!-- Third dock icon group (Task Panel Trigger) -->
-                            <g class="dock-icon" id="panel-trigger">
-                                <rect class="dock-icon-area" x="658" y="628" width="30" height="30" />
-                                <path
-                                    d="M672.643 648.643H668.982C668.242 648.643 667.643 648.043 667.643 647.304V638.982C667.643 638.242 668.242 637.643 668.982 637.643H672.643"
-                                    stroke="#D1D1D1" stroke-width="0.714286" stroke-linecap="round" />
-                                <path
-                                    d="M673.643 648.643H677.304C678.043 648.643 678.643 648.043 678.643 647.304V638.982C678.643 638.242 678.043 637.643 677.304 637.643H673.643"
-                                    stroke="#D1D1D1" stroke-width="0.714286" stroke-linecap="round" />
-                                <rect x="673.5" y="639" width="4" height="8" rx="0.714286" fill="#D1D1D1" />
-                            </g>
-
-                            <line x1="696.607" y1="633.107" x2="696.607" y2="652.893"
-                                stroke="url(#paint3_linear_595_14217)" stroke-width="0.214453" stroke-linecap="round" />
-                        </g>
                         <defs>
-                            <linearGradient id="paint0_linear_595_14217" x1="539" y1="633" x2="539" y2="653"
-                                gradientUnits="userSpaceOnUse">
-                                <stop stop-color="white" stop-opacity="0" />
-                                <stop offset="0.480769" stop-color="#CACACA" />
-                                <stop offset="1" stop-color="#999999" stop-opacity="0" />
-                            </linearGradient>
-                            <linearGradient id="paint1_linear_595_14217" x1="602" y1="633" x2="602" y2="653"
-                                gradientUnits="userSpaceOnUse">
-                                <stop stop-color="white" stop-opacity="0" />
-                                <stop offset="0.480769" stop-color="#CACACA" />
-                                <stop offset="1" stop-color="#999999" stop-opacity="0" />
-                            </linearGradient>
-                            <linearGradient id="paint2_linear_595_14217" x1="649" y1="633" x2="649" y2="653"
-                                gradientUnits="userSpaceOnUse">
-                                <stop stop-color="white" stop-opacity="0" />
-                                <stop offset="0.480769" stop-color="#CACACA" />
-                                <stop offset="1" stop-color="#999999" stop-opacity="0" />
-                            </linearGradient>
-                            <linearGradient id="paint3_linear_595_14217" x1="696" y1="633" x2="696" y2="653"
-                                gradientUnits="userSpaceOnUse">
-                                <stop stop-color="white" stop-opacity="0" />
-                                <stop offset="0.480769" stop-color="#CACACA" />
-                                <stop offset="1" stop-color="#999999" stop-opacity="0" />
-                            </linearGradient>
                             <clipPath id="clip0_595_14217">
                                 <rect width="100%" height="100%" fill="white" />
                             </clipPath>
@@ -325,6 +256,94 @@
                                 </g>
                             </mask>
                         </defs>
+                    </g>
+                </svg>
+
+                <svg class="canvas-overlay-svg" viewBox="0 0 1236 658" fill="none" xmlns="http://www.w3.org/2000/svg"
+                    preserveAspectRatio="none">
+                    <!-- SplitView Separator (Elite Transparency) -->
+                    <g id="splitview-divider" style="display: none;">
+                        <rect x="-2" y="0" width="11" height="100%" fill="transparent" />
+                        <path id="divider-line" d="" stroke="#1A1A1A" stroke-width="0.5" />
+                        <rect id="divider-handle" x="1.5" y="289.5" width="4" height="50" rx="2" fill="#999999" />
+                    </g>
+
+                    <g id="dock-elements">
+                        <line x1="539.607" y1="633.107" x2="539.607" y2="652.893" stroke="url(#paint0_linear_595_14217)"
+                            stroke-width="0.214453" stroke-linecap="round" />
+
+                        <!-- First dock icon group (SplitView Trigger) -->
+                        <g class="dock-icon" id="splitview-trigger">
+                            <rect class="dock-icon-area" x="555" y="628" width="30" height="30" />
+                            <path
+                                d="M569.214 648.5H566.982C566.242 648.5 565.643 647.9 565.643 647.161V639.125C565.643 638.385 566.242 637.786 566.982 637.786H569.214"
+                                stroke="#D1D1D1" stroke-width="0.714286" stroke-linecap="round" />
+                            <path
+                                d="M572.071 648.5H574.304C575.043 648.5 575.643 647.9 575.643 647.161V639.125C575.643 638.385 575.043 637.786 574.304 637.786H572.071"
+                                stroke="#D1D1D1" stroke-width="0.714286" stroke-linecap="round" />
+                            <path d="M570.643 636V650.286" stroke="#D1D1D1" stroke-width="0.714286"
+                                stroke-linecap="round" />
+                        </g>
+
+                        <line x1="602.607" y1="633.107" x2="602.607" y2="652.893" stroke="url(#paint1_linear_595_14217)"
+                            stroke-width="0.214453" stroke-linecap="round" />
+
+                        <!-- Second dock icon group -->
+                        <g class="dock-icon">
+                            <rect class="dock-icon-area" x="610" y="628" width="30" height="30" />
+                            <path
+                                d="M620.25 643.349C620.25 642.397 620.25 641.921 620.456 641.503C620.662 641.084 621.048 640.775 621.821 640.155L622.571 639.554C623.969 638.435 624.668 637.875 625.5 637.875C626.332 637.875 627.031 638.435 628.429 639.554L629.179 640.155C629.952 640.775 630.338 641.084 630.544 641.503C630.75 641.921 630.75 642.397 630.75 643.349V646.321C630.75 647.643 630.75 648.304 630.311 648.714C629.871 649.125 629.164 649.125 627.75 649.125H623.25C621.836 649.125 621.129 649.125 620.689 648.714C620.25 648.304 620.25 647.643 620.25 646.321V643.349Z"
+                                stroke="#D1D1D1" stroke-width="0.850003" />
+                            <path
+                                d="M627 649.125V646.048C627 645.676 626.699 645.375 626.327 645.375H624.673C624.301 645.375 624 645.676 624 646.048V649.125"
+                                stroke="#D1D1D1" stroke-width="0.850003" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        </g>
+
+                        <line x1="649.607" y1="633.107" x2="649.607" y2="652.893" stroke="url(#paint2_linear_595_14217)"
+                            stroke-width="0.214453" stroke-linecap="round" />
+
+                        <!-- Third dock icon group (Task Panel Trigger) -->
+                        <g class="dock-icon" id="panel-trigger">
+                            <rect class="dock-icon-area" x="658" y="628" width="30" height="30" />
+                            <path
+                                d="M672.643 648.643H668.982C668.242 648.643 667.643 648.043 667.643 647.304V638.982C667.643 638.242 668.242 637.643 668.982 637.643H672.643"
+                                stroke="#D1D1D1" stroke-width="0.714286" stroke-linecap="round" />
+                            <path
+                                d="M673.643 648.643H677.304C678.043 648.643 678.643 648.043 678.643 647.304V638.982C678.643 638.242 678.043 637.643 677.304 637.643H673.643"
+                                stroke="#D1D1D1" stroke-width="0.714286" stroke-linecap="round" />
+                            <rect x="673.5" y="639" width="4" height="8" rx="0.714286" fill="#D1D1D1" />
+                        </g>
+
+                        <line x1="696.607" y1="633.107" x2="696.607" y2="652.893" stroke="url(#paint3_linear_595_14217)"
+                            stroke-width="0.214453" stroke-linecap="round" />
+                    </g>
+                    <defs>
+                        <linearGradient id="paint0_linear_595_14217" x1="539" y1="633" x2="539" y2="653"
+                            gradientUnits="userSpaceOnUse">
+                            <stop stop-color="white" stop-opacity="0" />
+                            <stop offset="0.480769" stop-color="#CACACA" />
+                            <stop offset="1" stop-color="#999999" stop-opacity="0" />
+                        </linearGradient>
+                        <linearGradient id="paint1_linear_595_14217" x1="602" y1="633" x2="602" y2="653"
+                            gradientUnits="userSpaceOnUse">
+                            <stop stop-color="white" stop-opacity="0" />
+                            <stop offset="0.480769" stop-color="#CACACA" />
+                            <stop offset="1" stop-color="#999999" stop-opacity="0" />
+                        </linearGradient>
+                        <linearGradient id="paint2_linear_595_14217" x1="649" y1="633" x2="649" y2="653"
+                            gradientUnits="userSpaceOnUse">
+                            <stop stop-color="white" stop-opacity="0" />
+                            <stop offset="0.480769" stop-color="#CACACA" />
+                            <stop offset="1" stop-color="#999999" stop-opacity="0" />
+                        </linearGradient>
+                        <linearGradient id="paint3_linear_595_14217" x1="696" y1="633" x2="696" y2="653"
+                            gradientUnits="userSpaceOnUse">
+                            <stop stop-color="white" stop-opacity="0" />
+                            <stop offset="0.480769" stop-color="#CACACA" />
+                            <stop offset="1" stop-color="#999999" stop-opacity="0" />
+                        </linearGradient>
+                    </defs>
                 </svg>
                 <div class="panes-container">
                     <div id="pane-left" class="webview-pane"></div>
@@ -354,27 +373,40 @@
             const splitDivider = document.getElementById('splitview-divider');
             const wrapper = container.querySelector('.main-canvas-wrapper');
             const taskPanelPath = document.getElementById('task-panel-path');
+            const overlaySvg = document.querySelector('.canvas-overlay-svg');
+            const panesContainer = document.querySelector('.panes-container');
+
+            let splitRatio = 0.5;
+            let isDragging = false;
 
             const updateGeometry = () => {
                 const w = wrapper.offsetWidth;
                 const h = wrapper.offsetHeight;
 
-                // Update SVG viewBox to match pixels
                 const svg = canvasPath.closest('svg');
                 svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+                overlaySvg.setAttribute('viewBox', `0 0 ${w} ${h}`);
 
-                const L = 0;
-                const R = w;
-                const C = w / 2;
-                const rad = 10;
-                const bottom = h - 1;
-                const dockTop = h - 31;
+                const L = 0, R = w;
+                const winWidth = window.innerWidth;
+                const canvasRect = wrapper.getBoundingClientRect();
 
-                const fullD = `M ${L + rad} 1 H ${R - rad} Q ${R} 1 ${R} ${1 + rad} V ${bottom - rad} Q ${R} ${bottom} ${R - rad} ${bottom} H ${C + 119} C ${C + 94} ${bottom} ${C + 94} ${dockTop} ${C + 69} ${dockTop} H ${C - 71} C ${C - 96} ${dockTop} ${C - 96} ${bottom} ${C - 121} ${bottom} H ${L + rad} Q ${L} ${bottom} ${L} ${bottom - rad} V ${1 + rad} Q ${L} 1 ${L + rad} 1 Z`;
+                // Absolute Vertical Alignment: Center relative to the screen (Notch)
+                const dockCenter = (winWidth / 2) - canvasRect.left;
 
-                const leftD = `M ${L + rad} 1 H ${C - 3.5 - rad} Q ${C - 3.5} 1 ${C - 3.5} ${1 + rad} V ${dockTop - rad} Q ${C - 3.5} ${dockTop} ${C - 3.5 - rad} ${dockTop} H ${C - 71} C ${C - 96} ${dockTop} ${C - 96} ${bottom} ${C - 121} ${bottom} H ${L + rad} Q ${L} ${bottom} ${L} ${bottom - rad} V ${1 + rad} Q ${L} 1 ${L + rad} 1 Z`;
+                // SplitView Logic centered on the Notch by default
+                const splitX = w * splitRatio;
 
-                const rightD = `M ${C + 3.5 + rad} 1 H ${R - rad} Q ${R} 1 ${R} ${1 + rad} V ${bottom - rad} Q ${R} ${bottom} ${R - rad} ${bottom} H ${C + 119} C ${C + 94} ${bottom} ${C + 94} ${dockTop} ${C + 69} ${dockTop} H ${C + 3.5 + rad} Q ${C + 3.5} ${dockTop} ${C + 3.5} ${dockTop - rad} V ${1 + rad} Q ${C + 3.5} 1 ${C + 3.5 + rad} 1 Z`;
+                const rad = 10, bottom = h - 1, dockTop = h - 31;
+
+                // Dock segments (Symmetrically centered around the Notch alignment)
+                const dL = dockCenter - 120, dR = dockCenter + 120;
+                const dC1 = dockCenter - 95, dC2 = dockCenter - 70, dC3 = dockCenter + 70, dC4 = dockCenter + 95;
+
+                const fullD = `M ${L + rad} 1 H ${R - rad} Q ${R} 1 ${R} ${1 + rad} V ${bottom - rad} Q ${R} ${bottom} ${R - rad} ${bottom} H ${dR} C ${dC4} ${bottom} ${dC4} ${dockTop} ${dC3} ${dockTop} H ${dC2} C ${dC1} ${dockTop} ${dC1} ${bottom} ${dL} ${bottom} H ${L + rad} Q ${L} ${bottom} ${L} ${bottom - rad} V ${1 + rad} Q ${L} 1 ${L + rad} 1 Z`;
+
+                const leftD = `M ${L + rad} 1 H ${splitX - 3.5 - rad} Q ${splitX - 3.5} 1 ${splitX - 3.5} ${1 + rad} V ${h} H ${L} V ${1 + rad} Q ${L} 1 ${L + rad} 1 Z`;
+                const rightD = `M ${splitX + 3.5 + rad} 1 H ${R - rad} Q ${R} 1 ${R} ${1 + rad} V ${h} H ${splitX + 3.5} V ${1 + rad} Q ${splitX + 3.5} 1 ${splitX + 3.5 + rad} 1 Z`;
 
                 canvasPath.setAttribute('d', fullD);
                 maskFull.setAttribute('d', fullD);
@@ -382,21 +414,86 @@
                 rightPaneMask.setAttribute('d', rightD);
 
                 // Update Task Panel Path
-                const taskH = container.querySelector('.task-panel-wrapper').offsetHeight;
+                const taskH = container.querySelector('.task-panel-wrapper').offsetHeight || 658;
                 const taskD = `M 0 ${taskH - 7} V 7 Q 0 0 7 0 H 293 Q 300 0 300 7 V ${taskH - 7} Q 300 ${taskH} 293 ${taskH} H 7 Q 0 ${taskH} 0 ${taskH - 7} Z`;
                 if (taskPanelPath) taskPanelPath.setAttribute('d', taskD);
 
-                // Move dock elements to center
-                dockElements.setAttribute('transform', `translate(${C - 618}, ${h - 658})`);
-
-                // Move split divider to center
-                splitDivider.setAttribute('transform', `translate(${C - 3.5}, ${h - 657})`);
+                dockElements.setAttribute('transform', `translate(${dockCenter - 618.1}, ${h - 658})`);
+                splitDivider.setAttribute('transform', `translate(${splitX - 3.5}, 0)`);
 
                 const isActive = container.classList.contains('splitview-active');
                 maskSplit.style.display = isActive ? 'block' : 'none';
                 maskFull.style.display = isActive ? 'none' : 'block';
-                canvasPath.setAttribute('mask', 'url(#split-mask)');
+                splitDivider.style.display = isActive ? 'block' : 'none';
+
+                // Divider Line Logic: Must follow dock shape
+                const divLine = document.getElementById('divider-line');
+                const divHandle = document.getElementById('divider-handle');
+                const divX = 3.5; // Relative to group
+
+                // Determine vertical end of divider based on splitX intersection with dock
+                let divEndY = bottom;
+                if (splitX >= dC2 && splitX <= dC3) divEndY = dockTop;
+                else if (splitX < dL || splitX > dR) divEndY = bottom;
+                else divEndY = dockTop + 10; // Approximation for curves
+
+                divLine.setAttribute('d', `M ${divX} 0 V ${divEndY}`);
+                divHandle.setAttribute('y', (h / 2) - 25);
+
+                if (isActive) {
+                    panesContainer.style.gridTemplateColumns = `${splitX - 3.5}px 7px ${w - splitX - 3.5}px`;
+                    canvasPath.setAttribute('mask', 'url(#split-mask)');
+                } else {
+                    canvasPath.removeAttribute('mask');
+                }
             };
+
+            const onMouseMove = (e) => {
+                if (!isDragging) return;
+                const rect = wrapper.getBoundingClientRect();
+                let x = e.clientX - rect.left;
+
+                // Constraints: 250px min per pane
+                const minSide = 250;
+                if (x < minSide) x = minSide;
+                if (x > rect.width - minSide) x = rect.width - minSide;
+
+                // Magnetic Snap Points (Ultra-subtle Tier Elite implementation)
+                const snapThreshold = 2;
+                const centerX = (window.innerWidth / 2) - rect.left;
+                const snapPoints = [
+                    minSide,                // Left lateral stop
+                    rect.width * 0.25,     // Left pane midpoint
+                    centerX,                // Main center
+                    rect.width * 0.75,     // Right pane midpoint
+                    rect.width - minSide    // Right lateral stop
+                ];
+
+                for (const p of snapPoints) {
+                    if (Math.abs(x - p) < snapThreshold) {
+                        x = p;
+                        break;
+                    }
+                }
+
+                splitRatio = x / rect.width;
+                updateGeometry();
+            };
+
+            const onMouseUp = () => {
+                isDragging = false;
+                document.body.style.cursor = 'default';
+                window.removeEventListener('mousemove', onMouseMove);
+                window.removeEventListener('mouseup', onMouseUp);
+            };
+
+            splitDivider.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                document.body.style.cursor = 'col-resize';
+                window.addEventListener('mousemove', onMouseMove);
+                window.addEventListener('mouseup', onMouseUp);
+                e.preventDefault();
+            });
 
             const resizeObserver = new ResizeObserver(() => {
                 updateGeometry();
@@ -408,6 +505,7 @@
 
             trigger.addEventListener('click', () => {
                 container.classList.toggle('container-panel-open');
+                // Allow transition to finish then update geometry (or observer will handle it)
             });
 
             splitTrigger.addEventListener('click', () => {
