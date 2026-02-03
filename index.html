@@ -48,7 +48,7 @@
         }
 
         .container-panel-open {
-            gap: 7px;
+            gap: 4px;
         }
 
         .main-canvas-wrapper {
@@ -71,7 +71,7 @@
         }
 
         .container-panel-open .task-panel-wrapper {
-            width: 300px;
+            width: 250px;
         }
 
         .canvas-task-svg {
@@ -115,7 +115,7 @@
             width: 100%;
             height: 100%;
             display: none;
-            grid-template-columns: 1fr 7px 1fr;
+            grid-template-columns: 1fr 4px 1fr;
             z-index: 5;
             pointer-events: none;
             mask: url(#split-mask);
@@ -131,7 +131,7 @@
             position: relative;
             overflow: hidden;
             background: transparent;
-            border-radius: 10px;
+            border-radius: 5px;
         }
 
         #splitview-trigger {
@@ -155,6 +155,23 @@
 
         #splitview-divider {
             cursor: col-resize;
+        }
+
+        #divider-handle {
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+
+        #splitview-divider.active-handle #divider-handle {
+            opacity: 1;
+        }
+
+        #splitview-divider.idle #divider-handle {
+            opacity: 0.25;
+        }
+
+        #splitview-divider:hover #divider-handle {
+            opacity: 1 !important;
         }
     </style>
 </head>
@@ -249,12 +266,20 @@
                                 <rect width="100%" height="100%" fill="white" />
                             </clipPath>
                             <mask id="split-mask">
-                                <path id="mask-full" d="" fill="white" />
-                                <g id="mask-split-views" style="display: none;">
+                                <g id="mask-full-group">
+                                    <path id="mask-full" d="" fill="white" />
+                                </g>
+                                <g id="mask-split-group" style="display: none;">
                                     <path id="pane-left-mask-path" d="" fill="white" />
                                     <path id="pane-right-mask-path" d="" fill="white" />
                                 </g>
                             </mask>
+                            <clipPath id="zipper-clip-split">
+                                <rect id="zipper-rect-split" x="0" y="0" width="100%" height="0" />
+                            </clipPath>
+                            <clipPath id="zipper-clip-full">
+                                <rect id="zipper-rect-full" x="0" y="0" width="100%" height="100%" />
+                            </clipPath>
                         </defs>
                     </g>
                 </svg>
@@ -264,8 +289,7 @@
                     <!-- SplitView Separator (Elite Transparency) -->
                     <g id="splitview-divider" style="display: none;">
                         <rect x="-2" y="0" width="11" height="100%" fill="transparent" />
-                        <path id="divider-line" d="" stroke="#1A1A1A" stroke-width="0.5" />
-                        <rect id="divider-handle" x="1.5" y="289.5" width="4" height="50" rx="2" fill="#999999" />
+                        <rect id="divider-handle" x="1" y="289.5" width="2" height="50" rx="1" fill="#999999" />
                     </g>
 
                     <g id="dock-elements">
@@ -353,9 +377,9 @@
             </div>
 
             <div class="task-panel-wrapper">
-                <svg class="task-panel-svg" viewBox="0 0 300 658" fill="none" xmlns="http://www.w3.org/2000/svg"
+                <svg class="task-panel-svg" viewBox="0 0 250 658" fill="none" xmlns="http://www.w3.org/2000/svg"
                     preserveAspectRatio="none">
-                    <path id="task-panel-path" d="" fill="#0A0A0A" />
+                    <path id="task-panel-path" d="" fill="transparent" />
                 </svg>
             </div>
         </div>
@@ -375,9 +399,14 @@
             const taskPanelPath = document.getElementById('task-panel-path');
             const overlaySvg = document.querySelector('.canvas-overlay-svg');
             const panesContainer = document.querySelector('.panes-container');
+            const maskSplitGroup = document.getElementById('mask-split-group');
+            const zipperRectSplit = document.getElementById('zipper-rect-split');
+            const zipperRectFull = document.getElementById('zipper-rect-full');
 
             let splitRatio = 0.5;
             let isDragging = false;
+            let zipperProgress = 0; // 0 to 1
+            let isZipperAnimating = false;
 
             const updateGeometry = () => {
                 const w = wrapper.offsetWidth;
@@ -388,65 +417,122 @@
                 overlaySvg.setAttribute('viewBox', `0 0 ${w} ${h}`);
 
                 const L = 0, R = w;
-                const winWidth = window.innerWidth;
-                const canvasRect = wrapper.getBoundingClientRect();
+                const splitX = Math.round(w * splitRatio);
+                const rad = 5, bottom = h - 1, dockTop = h - 31, dockCenter = Math.round(w / 2);
 
-                // Absolute Vertical Alignment: Center relative to the screen (Notch)
-                const dockCenter = (winWidth / 2) - canvasRect.left;
-
-                // SplitView Logic centered on the Notch by default
-                const splitX = w * splitRatio;
-
-                const rad = 10, bottom = h - 1, dockTop = h - 31;
-
-                // Dock segments (Symmetrically centered around the Notch alignment)
-                const dL = dockCenter - 120, dR = dockCenter + 120;
-                const dC1 = dockCenter - 95, dC2 = dockCenter - 70, dC3 = dockCenter + 70, dC4 = dockCenter + 95;
+                // Dock segments
+                const dL = dockCenter - 121, dR = dockCenter + 119;
+                const dC1 = dockCenter - 96, dC2 = dockCenter - 71, dC3 = dockCenter + 69, dC4 = dockCenter + 94;
 
                 const fullD = `M ${L + rad} 1 H ${R - rad} Q ${R} 1 ${R} ${1 + rad} V ${bottom - rad} Q ${R} ${bottom} ${R - rad} ${bottom} H ${dR} C ${dC4} ${bottom} ${dC4} ${dockTop} ${dC3} ${dockTop} H ${dC2} C ${dC1} ${dockTop} ${dC1} ${bottom} ${dL} ${bottom} H ${L + rad} Q ${L} ${bottom} ${L} ${bottom - rad} V ${1 + rad} Q ${L} 1 ${L + rad} 1 Z`;
 
-                const leftD = `M ${L + rad} 1 H ${splitX - 3.5 - rad} Q ${splitX - 3.5} 1 ${splitX - 3.5} ${1 + rad} V ${h} H ${L} V ${1 + rad} Q ${L} 1 ${L + rad} 1 Z`;
-                const rightD = `M ${splitX + 3.5 + rad} 1 H ${R - rad} Q ${R} 1 ${R} ${1 + rad} V ${h} H ${splitX + 3.5} V ${1 + rad} Q ${splitX + 3.5} 1 ${splitX + 3.5 + rad} 1 Z`;
+                const leftD = `M ${L + rad} 1 H ${splitX - 2 - rad} Q ${splitX - 2} 1 ${splitX - 2} ${1 + rad} V ${h} H ${L + rad} Q ${L} ${bottom} ${L} ${bottom - rad} V ${1 + rad} Q ${L} 1 ${L + rad} 1 Z`;
+                const rightD = `M ${splitX + 2 + rad} 1 H ${R - rad} Q ${R} 1 ${R} ${1 + rad} V ${bottom - rad} Q ${R} ${bottom} ${R - rad} ${bottom} H ${splitX + 2} V ${1 + rad} Q ${splitX + 2} 1 ${splitX + 2 + rad} 1 Z`;
 
                 canvasPath.setAttribute('d', fullD);
                 maskFull.setAttribute('d', fullD);
                 leftPaneMask.setAttribute('d', leftD);
                 rightPaneMask.setAttribute('d', rightD);
 
-                // Update Task Panel Path
+                // Update Task Panel Path (250px width)
                 const taskH = container.querySelector('.task-panel-wrapper').offsetHeight || 658;
-                const taskD = `M 0 ${taskH - 7} V 7 Q 0 0 7 0 H 293 Q 300 0 300 7 V ${taskH - 7} Q 300 ${taskH} 293 ${taskH} H 7 Q 0 ${taskH} 0 ${taskH - 7} Z`;
+                const taskW = 250;
+                const taskRad = 5;
+                const taskBottom = taskH - 1;
+                const taskD = `M 0 ${taskBottom - taskRad} V ${taskRad} Q 0 1 ${taskRad} 1 H ${taskW - taskRad} Q ${taskW} 1 ${taskW} ${taskRad} V ${taskBottom - taskRad} Q ${taskW} ${taskBottom} ${taskW - taskRad} ${taskBottom} H ${taskRad} Q 0 ${taskBottom} 0 ${taskBottom - taskRad} Z`;
                 if (taskPanelPath) taskPanelPath.setAttribute('d', taskD);
 
-                dockElements.setAttribute('transform', `translate(${dockCenter - 618.1}, ${h - 658})`);
-                splitDivider.setAttribute('transform', `translate(${splitX - 3.5}, 0)`);
+                dockElements.setAttribute('transform', `translate(${dockCenter - 618}, ${h - 658})`);
+                splitDivider.setAttribute('transform', `translate(${splitX - 2}, 0)`);
 
                 const isActive = container.classList.contains('splitview-active');
-                maskSplit.style.display = isActive ? 'block' : 'none';
-                maskFull.style.display = isActive ? 'none' : 'block';
-                splitDivider.style.display = isActive ? 'block' : 'none';
 
-                // Divider Line Logic: Must follow dock shape
-                const divLine = document.getElementById('divider-line');
+                // Zipper logic
+                const zipperY = h * zipperProgress;
+                maskSplitGroup.style.display = 'block'; // Always block when animating or active
+
+                // Apply clipping to simulate zipper
+                document.getElementById('mask-full-group').setAttribute('clip-path', 'url(#zipper-clip-full)');
+                maskSplitGroup.setAttribute('clip-path', 'url(#zipper-clip-split)');
+
+                zipperRectSplit.setAttribute('height', zipperY);
+                zipperRectFull.setAttribute('y', zipperY);
+                zipperRectFull.setAttribute('height', h - zipperY);
+
+                // Divider Logic: Must follow dock shape
                 const divHandle = document.getElementById('divider-handle');
-                const divX = 3.5; // Relative to group
 
-                // Determine vertical end of divider based on splitX intersection with dock
-                let divEndY = bottom;
-                if (splitX >= dC2 && splitX <= dC3) divEndY = dockTop;
-                else if (splitX < dL || splitX > dR) divEndY = bottom;
-                else divEndY = dockTop + 10; // Approximation for curves
+                // Determine handle snapping position: follows zipper during animation, then centers
+                const targetHandleY = isZipperAnimating ? zipperY - 25 : (h / 2) - 25;
+                divHandle.setAttribute('y', Math.max(0, Math.min(h - 50, targetHandleY)));
 
-                divLine.setAttribute('d', `M ${divX} 0 V ${divEndY}`);
-                divHandle.setAttribute('y', (h / 2) - 25);
-
-                if (isActive) {
-                    panesContainer.style.gridTemplateColumns = `${splitX - 3.5}px 7px ${w - splitX - 3.5}px`;
+                if (isActive || isZipperAnimating) {
+                    panesContainer.style.display = 'grid';
+                    panesContainer.style.gridTemplateColumns = `${splitX - 2}px 4px ${w - splitX - 2}px`;
                     canvasPath.setAttribute('mask', 'url(#split-mask)');
+                    resetIdleTimer();
                 } else {
+                    panesContainer.style.display = 'none';
                     canvasPath.removeAttribute('mask');
                 }
+
+                splitDivider.style.display = (isActive || isZipperAnimating) ? 'block' : 'none';
+                // splitDivider.style.opacity = zipperProgress; // Fade in with zipper - removed as per instruction
             };
+
+            const startZipperAnimation = (forward) => {
+                isZipperAnimating = true;
+                const duration = 650; // ms
+                const startTime = performance.now();
+                const startVal = zipperProgress;
+                const endVal = forward ? 1 : 0;
+
+                const step = (now) => {
+                    const elapsed = now - startTime;
+                    const p = Math.min(elapsed / duration, 1);
+
+                    // Ease out cubic
+                    const ease = 1 - Math.pow(1 - p, 3);
+
+                    zipperProgress = startVal + (endVal - startVal) * ease;
+                    updateGeometry();
+
+                    if (p < 1) {
+                        requestAnimationFrame(step);
+                    } else {
+                        isZipperAnimating = false;
+                        zipperProgress = endVal;
+                        updateGeometry();
+
+                        // New Phase: Progressive appearance of the handle
+                        if (forward) {
+                            splitDivider.classList.add('active-handle');
+                        } else {
+                            splitDivider.classList.remove('active-handle');
+                        }
+                    }
+                };
+
+                if (!forward) {
+                    splitDivider.classList.remove('active-handle');
+                }
+                requestAnimationFrame(step);
+            };
+
+            let idleTimer;
+            const resetIdleTimer = () => {
+                if (!splitDivider) return;
+                splitDivider.classList.remove('idle');
+                clearTimeout(idleTimer);
+                idleTimer = setTimeout(() => {
+                    if (!isDragging) {
+                        splitDivider.classList.add('idle');
+                    }
+                }, 5000); // 5 seconds
+            };
+
+            window.addEventListener('mousemove', resetIdleTimer);
+            window.addEventListener('mousedown', resetIdleTimer);
 
             const onMouseMove = (e) => {
                 if (!isDragging) return;
@@ -458,9 +544,9 @@
                 if (x < minSide) x = minSide;
                 if (x > rect.width - minSide) x = rect.width - minSide;
 
-                // Magnetic Snap Points (Ultra-subtle Tier Elite implementation)
-                const snapThreshold = 2;
-                const centerX = (window.innerWidth / 2) - rect.left;
+                // Magnetic Snap Points (Tier Elite implementation)
+                const snapThreshold = 8;
+                const centerX = rect.width / 2;
                 const snapPoints = [
                     minSide,                // Left lateral stop
                     rect.width * 0.25,     // Left pane midpoint
@@ -509,8 +595,9 @@
             });
 
             splitTrigger.addEventListener('click', () => {
+                const becomingActive = !container.classList.contains('splitview-active');
                 container.classList.toggle('splitview-active');
-                updateGeometry();
+                startZipperAnimation(becomingActive);
             });
         </script>
     </div>
