@@ -19,6 +19,7 @@
             height: 100vh;
             position: relative;
             background: transparent;
+            -webkit-app-region: drag;
         }
 
         .notch-container {
@@ -27,6 +28,7 @@
             left: 50%;
             transform: translateX(-50%);
             z-index: 10;
+            -webkit-app-region: no-drag;
         }
 
         .notch-svg {
@@ -45,6 +47,7 @@
             align-items: center;
             gap: 0;
             transition: gap 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            -webkit-app-region: no-drag;
         }
 
         .container-panel-open {
@@ -86,7 +89,6 @@
         .task-panel-svg {
             display: block;
             width: 100%;
-            /* Make task panel SVG responsive to its wrapper */
             height: 100%;
         }
 
@@ -105,17 +107,54 @@
         .dock-icon-area {
             fill: transparent;
             cursor: pointer;
+            pointer-events: auto;
         }
 
-        /* Functional SplitView Panes (Tier II Elite Implementation) */
+        #dock-hit-area {
+            position: fixed;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 250px;
+            bottom: 0;
+            height: 15px;
+            z-index: 1200;
+            pointer-events: auto;
+            background: transparent;
+            cursor: default;
+        }
+
+        #dock-elements {
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+            z-index: 1150;
+        }
+
+        #dock-elements .dock-icon {
+            pointer-events: none;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #dock-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 900;
+            background: transparent;
+            display: none;
+            pointer-events: auto;
+            cursor: default;
+        }
+
         .panes-container {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            display: none;
-            grid-template-columns: 1fr 4px 1fr;
+            display: grid;
+            grid-template-columns: 1fr 0px 0px;
             z-index: 5;
             pointer-events: none;
             mask: url(#split-mask);
@@ -126,12 +165,24 @@
             display: grid;
         }
 
+        .spacer {
+            background: transparent;
+            pointer-events: none;
+        }
+
         .webview-pane {
             pointer-events: auto;
             position: relative;
             overflow: hidden;
             background: transparent;
             border-radius: 5px;
+        }
+
+        .webview-pane webview {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: #000;
         }
 
         #splitview-trigger {
@@ -145,7 +196,7 @@
             width: 100%;
             height: 100%;
             display: block;
-            z-index: 15;
+            z-index: 1100;
             pointer-events: none;
         }
 
@@ -173,11 +224,17 @@
         #splitview-divider:hover #divider-handle {
             opacity: 1 !important;
         }
+
+        /* Prevent webviews from capturing mouse events during resize */
+        body.is-resizing webview {
+            pointer-events: none;
+        }
     </style>
 </head>
 
 <body>
     <div class="window-container">
+        <div id="dock-backdrop"></div>
         <div class="notch-container">
             <svg class="notch-svg" width="300" height="20" viewBox="0 0 300 20" fill="none"
                 xmlns="http://www.w3.org/2000/svg">
@@ -186,6 +243,7 @@
         </div>
         <div class="canvas-task-container" id="main-container">
             <div class="main-canvas-wrapper">
+                <div id="dock-hit-area"></div>
                 <svg class="canvas-task-svg" viewBox="0 0 1236 658" fill="none" xmlns="http://www.w3.org/2000/svg"
                     preserveAspectRatio="none">
                     <g clip-path="url(#clip0_595_14217)">
@@ -215,60 +273,64 @@
 
                 <svg class="canvas-overlay-svg" viewBox="0 0 1236 658" fill="none" xmlns="http://www.w3.org/2000/svg"
                     preserveAspectRatio="none">
-                    <!-- SplitView Separator (Elite Transparency) -->
+                    <!-- SplitView Separator -->
                     <g id="splitview-divider" style="display: none;">
                         <rect x="-2" y="0" width="11" height="100%" fill="transparent" />
                         <rect id="divider-handle" x="1" y="289.5" width="2" height="50" rx="1" fill="#999999" />
                     </g>
 
                     <g id="dock-elements">
-                        <line x1="539.607" y1="633.107" x2="539.607" y2="652.893" stroke="url(#paint0_linear_595_14217)"
+                        <!-- Left Separator -->
+                        <line x1="537" y1="633.107" x2="537" y2="652.893" stroke="url(#paint0_linear_595_14217)"
                             stroke-width="0.214453" stroke-linecap="round" />
 
-                        <!-- Icon 1: SplitView Trigger (Original paths, centered) -->
+                        <!-- Icon 1: SplitView Trigger (Center 564, gap 12px) -->
                         <g class="dock-icon" id="splitview-trigger">
-                            <rect class="dock-icon-area" x="555" y="628" width="30" height="30" />
+                            <rect class="dock-icon-area" x="549" y="628" width="30" height="30" />
                             <path
-                                d="M568.571 648.5H566.339C565.599 648.5 565 647.9 565 647.161V639.125C565 638.385 565.599 637.786 566.339 637.786H568.571"
+                                d="M562.571 648.5H560.339C559.599 648.5 559 647.9 559 647.161V639.125C559 638.385 559.599 637.786 560.339 637.786H562.571"
                                 stroke="#D1D1D1" stroke-width="0.714286" stroke-linecap="round" fill="none" />
                             <path
-                                d="M571.429 648.5H573.661C574.4 648.5 575 647.9 575 647.161V639.125C575 638.385 574.4 637.786 573.661 637.786H571.429"
+                                d="M565.429 648.5H567.661C568.4 648.5 569 647.9 569 647.161V639.125C569 638.385 568.4 637.786 567.661 637.786H565.429"
                                 stroke="#D1D1D1" stroke-width="0.714286" stroke-linecap="round" fill="none" />
-                            <path d="M570 636V650.286" stroke="#D1D1D1" stroke-width="0.714286" stroke-linecap="round"
+                            <path d="M564 636V650.286" stroke="#D1D1D1" stroke-width="0.714286" stroke-linecap="round"
                                 fill="none" />
                         </g>
 
-                        <line x1="602.607" y1="633.107" x2="602.607" y2="652.893" stroke="url(#paint1_linear_595_14217)"
+                        <!-- Mid-Left Separator -->
+                        <line x1="591" y1="633.107" x2="591" y2="652.893" stroke="url(#paint1_linear_595_14217)"
                             stroke-width="0.214453" stroke-linecap="round" />
 
-                        <!-- Icon 2: Home (Original paths, centered) -->
+                        <!-- Icon 2: Home (Center 618, gap 12px) -->
                         <g class="dock-icon">
-                            <rect class="dock-icon-area" x="610" y="628" width="30" height="30" />
+                            <rect class="dock-icon-area" x="603" y="628" width="30" height="30" />
                             <path
-                                d="M619.65 643.242C619.65 642.29 619.65 641.814 619.856 641.396C620.062 640.977 620.448 640.668 621.221 640.048L621.971 639.447C623.369 638.328 624.068 637.768 624.9 637.768C625.732 637.768 626.431 638.328 627.829 639.447L628.579 640.048C629.352 640.668 629.738 640.977 629.944 641.396C630.15 641.814 630.15 642.29 630.15 643.242V646.214C630.15 647.536 630.15 648.197 629.711 648.607C629.271 649.018 628.564 649.018 627.15 649.018H622.65C621.236 649.018 620.529 649.018 620.089 648.607C619.65 648.197 619.65 647.536 619.65 646.214V643.242Z"
+                                d="M612.65 643.242C612.65 642.29 612.65 641.814 612.856 641.396C613.062 640.977 613.448 640.668 614.221 640.048L614.971 639.447C616.369 638.328 617.068 637.768 617.9 637.768C618.732 637.768 619.431 638.328 620.829 639.447L621.579 640.048C622.352 640.668 622.738 640.977 622.944 641.396C623.15 641.814 623.15 642.29 623.15 643.242V646.214C623.15 647.536 623.15 648.197 622.711 648.607C622.271 649.018 621.564 649.018 620.15 649.018H615.65C614.236 649.018 613.529 649.018 613.089 648.607C612.65 648.197 612.65 647.536 612.65 646.214V643.242Z"
                                 stroke="#D1D1D1" stroke-width="0.850003" fill="none" />
                             <path
-                                d="M626.4 649.018V645.941C626.4 645.569 626.099 645.268 625.727 645.268H624.073C623.701 645.268 623.4 645.569 623.4 645.941V649.018"
+                                d="M619.4 649.018V645.941C619.4 645.569 619.099 645.268 618.727 645.268H617.073C616.701 645.268 616.4 645.569 616.4 645.941V649.018"
                                 stroke="#D1D1D1" stroke-width="0.850003" stroke-linecap="round" stroke-linejoin="round"
                                 fill="none" />
                         </g>
 
-                        <line x1="649.607" y1="633.107" x2="649.607" y2="652.893" stroke="url(#paint2_linear_595_14217)"
+                        <!-- Mid-Right Separator -->
+                        <line x1="645" y1="633.107" x2="645" y2="652.893" stroke="url(#paint2_linear_595_14217)"
                             stroke-width="0.214453" stroke-linecap="round" />
 
-                        <!-- Icon 3: Panel Trigger (Original paths, centered) -->
+                        <!-- Icon 3: Panel Trigger (Center 672, gap 12px) -->
                         <g class="dock-icon" id="panel-trigger">
-                            <rect class="dock-icon-area" x="658" y="628" width="30" height="30" />
+                            <rect class="dock-icon-area" x="657" y="628" width="30" height="30" />
                             <path
-                                d="M672.643 648.643H668.982C668.242 648.643 667.643 648.043 667.643 647.304V638.982C667.643 638.242 668.242 637.643 668.982 637.643H672.643"
+                                d="M671.643 648.643H667.982C667.242 648.643 666.643 648.043 666.643 647.304V638.982C666.643 638.242 667.242 637.643 667.982 637.643H671.643"
                                 stroke="#D1D1D1" stroke-width="0.714286" stroke-linecap="round" fill="none" />
                             <path
-                                d="M673.643 648.643H677.304C678.043 648.643 678.643 648.043 678.643 647.304V638.982C678.643 638.242 678.043 637.643 677.304 637.643H673.643"
+                                d="M672.643 648.643H676.304C677.043 648.643 677.643 648.043 677.643 647.304V638.982C677.643 638.242 677.043 637.643 676.304 637.643H672.643"
                                 stroke="#D1D1D1" stroke-width="0.714286" stroke-linecap="round" fill="none" />
-                            <rect x="673.5" y="639" width="4" height="8" rx="0.714286" fill="#D1D1D1" />
+                            <rect x="672.5" y="639" width="4" height="8" rx="0.714286" fill="#D1D1D1" />
                         </g>
 
-                        <line x1="696.607" y1="633.107" x2="696.607" y2="652.893" stroke="url(#paint3_linear_595_14217)"
+                        <!-- Right Separator -->
+                        <line x1="699" y1="633.107" x2="699" y2="652.893" stroke="url(#paint3_linear_595_14217)"
                             stroke-width="0.214453" stroke-linecap="round" />
                     </g>
                     <defs>
@@ -299,9 +361,13 @@
                     </defs>
                 </svg>
                 <div class="panes-container">
-                    <div id="pane-left" class="webview-pane"></div>
+                    <div id="pane-left" class="webview-pane">
+                        <webview id="wv-left" src="http://localhost:3001" allowpopups></webview>
+                    </div>
                     <div class="spacer"></div>
-                    <div id="pane-right" class="webview-pane"></div>
+                    <div id="pane-right" class="webview-pane">
+                        <!-- Content injected via JS -->
+                    </div>
                 </div>
             </div>
 
@@ -318,7 +384,6 @@
             const trigger = document.getElementById('panel-trigger');
             const splitTrigger = document.getElementById('splitview-trigger');
             const maskFull = document.getElementById('mask-full');
-            const maskSplit = document.getElementById('mask-split-views');
             const leftPaneMask = document.getElementById('pane-left-mask-path');
             const rightPaneMask = document.getElementById('pane-right-mask-path');
             const canvasPath = document.getElementById('main-canvas-path');
@@ -332,122 +397,248 @@
             const zipperRectSplit = document.getElementById('zipper-rect-split');
             const zipperRectFull = document.getElementById('zipper-rect-full');
 
-            let splitRatio = 0.5;
+            let splitRatio = 1.0; // Start at full width (single view)
             let isDragging = false;
-            let zipperProgress = 0; // 0 to 1
-            let isZipperAnimating = false;
+            let viewMode = 'single-left'; // 'single-left', 'single-right', 'split'
+
+            // Initial state check
+            if (container.classList.contains('splitview-active')) {
+                viewMode = 'split';
+                splitRatio = 0.5;
+            }
+
+            let dockState = 'closed'; // 'open' or 'closed'
+
+            // Physics Constants for ULTRA-VISCOUS (Pure Honey)
+            const K_CENTER = 0.05;
+            const K_LATERAL = 0.025;
+            const DAMPING = 0.35;    // Maximum viscosity
+            const DT = 1.0;
+
+            // Dock Particle System with safe initial state
+            const particles = {
+                dL: { x: 0, y: 700, py: 700, k: K_LATERAL, ty: 0 },
+                dR: { x: 0, y: 700, py: 700, k: K_LATERAL, ty: 0 },
+                dC1: { x: 0, y: 700, py: 700, k: K_LATERAL * 1.5, ty: 0 },
+                dC2: { x: 0, y: 700, py: 700, k: K_CENTER, ty: 0 },
+                dC3: { x: 0, y: 700, py: 700, k: K_CENTER, ty: 0 },
+                dC4: { x: 0, y: 700, py: 700, k: K_LATERAL * 1.5, ty: 0 }
+            };
+
+            const initParticles = (w, h) => {
+                const bottom = h - 1;
+                const dockTop = h - 26;
+
+                // Set initial y and py to bottom (closed state)
+                particles.dL.y = particles.dL.py = bottom; particles.dL.ty = bottom;
+                particles.dR.y = particles.dR.py = bottom; particles.dR.ty = bottom;
+                particles.dC1.y = particles.dC1.py = bottom; particles.dC1.ty = bottom;
+                particles.dC2.y = particles.dC2.py = bottom; particles.dC2.ty = dockTop;
+                particles.dC3.y = particles.dC3.py = bottom; particles.dC3.ty = dockTop;
+                particles.dC4.y = particles.dC4.py = bottom; particles.dC4.ty = bottom;
+            };
+
+            const updatePhysics = (h) => {
+                const bottom = h - 1;
+                const isClosed = (dockState === 'closed');
+
+                // CENTER ICON (Home) reveals at 82%, edges at 95%
+                const progress = (bottom - particles.dC2.y) / 25;
+                const centerVis = Math.max(0, (progress - 0.82) / 0.18);
+                const edgeVis = Math.max(0, (progress - 0.95) / 0.05);
+
+                const icons = dockElements.querySelectorAll('.dock-icon');
+                const lines = dockElements.querySelectorAll('line');
+
+                icons.forEach((icon, idx) => {
+                    const isCenter = (idx === 1);
+                    const v = isCenter ? centerVis : edgeVis;
+                    icon.style.opacity = Math.pow(v, 2);
+                    icon.style.pointerEvents = (v > 0.5) ? 'auto' : 'none';
+                });
+
+                lines.forEach(line => {
+                    line.style.opacity = Math.pow(edgeVis, 2);
+                });
+
+                dockElements.style.opacity = 1;
+
+                for (let key in particles) {
+                    const p = particles[key];
+                    const targetY = isClosed ? bottom : p.ty;
+
+                    // Hooke's Law with progressive leader logic
+                    const force = (targetY - p.y) * p.k;
+
+                    // Verlet Integration with high damping (no bounce)
+                    const velocity = (p.y - p.py) * DAMPING;
+                    const nextY = p.y + velocity + force * (DT * DT);
+
+                    p.py = p.y;
+                    p.y = nextY;
+                }
+            };
 
             const updateGeometry = () => {
                 const w = wrapper.offsetWidth;
                 const h = wrapper.offsetHeight;
-
                 const svg = canvasPath.closest('svg');
                 svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
                 overlaySvg.setAttribute('viewBox', `0 0 ${w} ${h}`);
 
-                const L = 0, R = w;
-                const splitX = Math.round(w * splitRatio);
-                const rad = 5, bottom = h - 1, dockTop = h - 31, dockCenter = Math.round(w / 2);
+                const L = 0, R = w, rad = 5, bottom = h - 1;
 
-                // Dock segments
-                const dL = dockCenter - 121, dR = dockCenter + 119;
-                const dC1 = dockCenter - 96, dC2 = dockCenter - 71, dC3 = dockCenter + 69, dC4 = dockCenter + 94;
+                // Allow splitX to go fully edge-to-edge
+                let splitX = Math.round(w * splitRatio);
+                splitX = Math.max(0, Math.min(w, splitX));
 
-                const fullD = `M ${L + rad} 1 H ${R - rad} Q ${R} 1 ${R} ${1 + rad} V ${bottom - rad} Q ${R} ${bottom} ${R - rad} ${bottom} H ${dR} C ${dC4} ${bottom} ${dC4} ${dockTop} ${dC3} ${dockTop} H ${dC2} C ${dC1} ${dockTop} ${dC1} ${bottom} ${dL} ${bottom} H ${L + rad} Q ${L} ${bottom} ${L} ${bottom - rad} V ${1 + rad} Q ${L} 1 ${L + rad} 1 Z`;
+                const p = particles;
 
-                const leftD = `M ${L + rad} 1 H ${splitX - 2 - rad} Q ${splitX - 2} 1 ${splitX - 2} ${1 + rad} V ${h} H ${L + rad} Q ${L} ${bottom} ${L} ${bottom - rad} V ${1 + rad} Q ${L} 1 ${L + rad} 1 Z`;
-                const rightD = `M ${splitX + 2 + rad} 1 H ${R - rad} Q ${R} 1 ${R} ${1 + rad} V ${bottom - rad} Q ${R} ${bottom} ${R - rad} ${bottom} H ${splitX + 2} V ${1 + rad} Q ${splitX + 2} 1 ${splitX + 2 + rad} 1 Z`;
+                // Sync X positions with current center
+                const dockCenter = Math.round(w / 2);
+                p.dL.x = dockCenter - 121; p.dR.x = dockCenter + 119;
+                p.dC1.x = dockCenter - 96; p.dC2.x = dockCenter - 71;
+                p.dC3.x = dockCenter + 69; p.dC4.x = dockCenter + 94;
+
+                const fullD = `M ${L + rad} 1 H ${R - rad} Q ${R} 1 ${R} ${1 + rad} V ${bottom - rad} Q ${R} ${bottom} ${R - rad} ${bottom} H ${p.dR.x} C ${p.dC4.x} ${bottom} ${p.dC4.x} ${p.dC3.y} ${p.dC3.x} ${p.dC3.y} H ${p.dC2.x} C ${p.dC1.x} ${p.dC2.y} ${p.dC1.x} ${bottom} ${p.dL.x} ${bottom} H ${L + rad} Q ${L} ${bottom} ${L} ${bottom - rad} V ${1 + rad} Q ${L} 1 ${L + rad} 1 Z`;
+
+                const leftD = `M ${L + rad} 1 H ${splitX - 2 - rad} Q ${splitX - 2} 1 ${splitX - 2} ${1 + rad} 
+                               V ${p.dC2.y} H ${p.dC2.x} 
+                               C ${p.dC1.x} ${p.dC2.y} ${p.dC1.x} ${bottom} ${p.dL.x} ${bottom} 
+                               H ${L + rad} Q ${L} ${bottom} ${L} ${bottom - rad} 
+                               V ${1 + rad} Q ${L} 1 ${L + rad} 1 Z`;
+
+                const rightD = `M ${splitX + 2 + rad} 1 H ${R - rad} Q ${R} 1 ${R} ${1 + rad} 
+                                V ${bottom - rad} Q ${R} ${bottom} ${R - rad} ${bottom} 
+                                H ${p.dR.x} 
+                                C ${p.dC4.x} ${bottom} ${p.dC4.x} ${p.dC3.y} ${p.dC3.x} ${p.dC3.y} 
+                                H ${splitX + 2} 
+                                V ${1 + rad} Q ${splitX + 2} 1 ${splitX + 2 + rad} 1 Z`;
 
                 canvasPath.setAttribute('d', fullD);
                 maskFull.setAttribute('d', fullD);
                 leftPaneMask.setAttribute('d', leftD);
                 rightPaneMask.setAttribute('d', rightD);
 
-                // Update Task Panel Path (250px width)
+                // Task Panel
                 const taskH = container.querySelector('.task-panel-wrapper').offsetHeight || 658;
-                const taskW = 250;
-                const taskRad = 5;
-                const taskBottom = taskH - 1;
+                const taskW = 250, taskRad = 5, taskBottom = taskH - 1;
                 const taskD = `M 0 ${taskBottom - taskRad} V ${taskRad} Q 0 1 ${taskRad} 1 H ${taskW - taskRad} Q ${taskW} 1 ${taskW} ${taskRad} V ${taskBottom - taskRad} Q ${taskW} ${taskBottom} ${taskW - taskRad} ${taskBottom} H ${taskRad} Q 0 ${taskBottom} 0 ${taskBottom - taskRad} Z`;
                 if (taskPanelPath) taskPanelPath.setAttribute('d', taskD);
 
-                dockElements.setAttribute('transform', `translate(${dockCenter - 618}, ${h - 658})`);
-                splitDivider.setAttribute('transform', `translate(${splitX - 2}, 0)`);
+                dockElements.setAttribute('transform', `translate(${dockCenter - 618}, ${h - 656.5})`);
 
-                const isActive = container.classList.contains('splitview-active');
+                // Set Split Divider Position
+                splitDivider.style.transform = `translate(${splitX - 2}px, 0)`;
 
-                // Zipper logic
-                const zipperY = h * zipperProgress;
-                maskSplitGroup.style.display = 'block'; // Always block when animating or active
-
-                // Apply clipping to simulate zipper
-                document.getElementById('mask-full-group').setAttribute('clip-path', 'url(#zipper-clip-full)');
-                maskSplitGroup.setAttribute('clip-path', 'url(#zipper-clip-split)');
-
-                zipperRectSplit.setAttribute('height', zipperY);
-                zipperRectFull.setAttribute('y', zipperY);
-                zipperRectFull.setAttribute('height', h - zipperY);
-
-                // Divider Logic: Must follow dock shape
-                const divHandle = document.getElementById('divider-handle');
-
-                // Determine handle snapping position: follows zipper during animation, then centers
-                const targetHandleY = isZipperAnimating ? zipperY - 25 : (h / 2) - 25;
-                divHandle.setAttribute('y', Math.max(0, Math.min(h - 50, targetHandleY)));
-
-                if (isActive || isZipperAnimating) {
-                    panesContainer.style.display = 'grid';
-                    panesContainer.style.gridTemplateColumns = `${splitX - 2}px 4px ${w - splitX - 2}px`;
-                    canvasPath.setAttribute('mask', 'url(#split-mask)');
-                    resetIdleTimer();
+                // Handle Grid and Visibility based on SplitRatio
+                if (splitRatio >= 0.99) {
+                    // Single Left
+                    panesContainer.style.gridTemplateColumns = `1fr 0px 0px`;
+                    splitDivider.style.display = 'none';
+                } else if (splitRatio <= 0.01) {
+                    // Single Right
+                    panesContainer.style.gridTemplateColumns = `0px 0px 1fr`;
+                    splitDivider.style.display = 'none';
                 } else {
-                    panesContainer.style.display = 'none';
-                    canvasPath.removeAttribute('mask');
+                    // Split
+                    panesContainer.style.gridTemplateColumns = `${splitX - 2}px 4px ${w - splitX - 2}px`;
+                    splitDivider.style.display = 'block';
                 }
 
-                splitDivider.style.display = (isActive || isZipperAnimating) ? 'block' : 'none';
-                splitDivider.style.opacity = zipperProgress;
+                // Update Masks logic for push effect
+                const maskFullGrp = document.getElementById('mask-full-group');
+                const maskSplitGrp = document.getElementById('mask-split-group');
+
+                // If effectively single view, use full mask. If split, use split mask group.
+                if (splitRatio > 0.99 || splitRatio < 0.01) {
+                    maskFullGrp.style.display = 'block';
+                    maskSplitGrp.style.display = 'none';
+                } else {
+                    maskFullGrp.style.display = 'none';
+                    maskSplitGrp.style.display = 'block';
+                }
+
+                // Reset zipper clips to always show content (disable old zipper effect)
+                zipperRectSplit.setAttribute('height', '100%');
+                zipperRectFull.setAttribute('height', '100%');
+                zipperRectFull.setAttribute('y', '0');
+
+                canvasPath.setAttribute('mask', 'url(#split-mask)');
             };
 
-            const startZipperAnimation = (forward) => {
-                isZipperAnimating = true;
-                const duration = 650; // ms
+            const animate = () => {
+                const h = wrapper.offsetHeight;
+                updatePhysics(h);
+                updateGeometry();
+                requestAnimationFrame(animate);
+            };
+
+            // HitArea and Backdrop logic
+            const hitArea = document.getElementById('dock-hit-area');
+            const backdrop = document.getElementById('dock-backdrop');
+
+            hitArea.addEventListener('mouseenter', () => {
+                if (dockState === 'closed') {
+                    dockState = 'open';
+                    hitArea.style.pointerEvents = 'none';
+                    backdrop.style.display = 'block';
+                }
+            });
+
+            backdrop.addEventListener('mousedown', () => {
+                dockState = 'closed';
+                backdrop.style.display = 'none';
+                setTimeout(() => {
+                    hitArea.style.pointerEvents = 'auto';
+                }, 500);
+            });
+
+            window.addEventListener('load', () => {
+                initParticles(wrapper.offsetWidth, wrapper.offsetHeight);
+                requestAnimationFrame(animate);
+            });
+
+            // New Animation Function: Push/Slide
+            const animateSplitRatio = (targetRatio) => {
+                const duration = 500;
                 const startTime = performance.now();
-                const startVal = zipperProgress;
-                const endVal = forward ? 1 : 0;
+                const startRatio = splitRatio;
 
                 const step = (now) => {
                     const elapsed = now - startTime;
                     const p = Math.min(elapsed / duration, 1);
+                    const ease = 1 - Math.pow(1 - p, 3); // Cubic ease out
 
-                    // Ease out cubic
-                    const ease = 1 - Math.pow(1 - p, 3);
-
-                    zipperProgress = startVal + (endVal - startVal) * ease;
+                    splitRatio = startRatio + (targetRatio - startRatio) * ease;
                     updateGeometry();
 
                     if (p < 1) {
                         requestAnimationFrame(step);
                     } else {
-                        isZipperAnimating = false;
-                        zipperProgress = endVal;
+                        // Snap exactly to target
+                        splitRatio = targetRatio;
+                        updateViewModeState();
                         updateGeometry();
-
-                        // New Phase: Progressive appearance of the handle
-                        if (forward) {
-                            splitDivider.classList.add('active-handle');
-                        } else {
-                            splitDivider.classList.remove('active-handle');
-                        }
                     }
                 };
-
-                if (!forward) {
-                    splitDivider.classList.remove('active-handle');
-                }
                 requestAnimationFrame(step);
             };
 
+            const updateViewModeState = () => {
+                if (splitRatio >= 0.99) {
+                    viewMode = 'single-left';
+                    container.classList.remove('splitview-active');
+                } else if (splitRatio <= 0.01) {
+                    viewMode = 'single-right';
+                    container.classList.remove('splitview-active');
+                } else {
+                    viewMode = 'split';
+                    container.classList.add('splitview-active');
+                }
+            };
+
+            // Mouse Drag Logic
             let idleTimer;
             const resetIdleTimer = () => {
                 if (!splitDivider) return;
@@ -457,7 +648,7 @@
                     if (!isDragging) {
                         splitDivider.classList.add('idle');
                     }
-                }, 5000); // 5 seconds
+                }, 5000);
             };
 
             window.addEventListener('mousemove', resetIdleTimer);
@@ -468,28 +659,11 @@
                 const rect = wrapper.getBoundingClientRect();
                 let x = e.clientX - rect.left;
 
-                // Constraints: 250px min per pane
-                const minSide = 250;
-                if (x < minSide) x = minSide;
-                if (x > rect.width - minSide) x = rect.width - minSide;
-
-                // Magnetic Snap Points (Tier Elite implementation)
-                const snapThreshold = 8;
-                const centerX = rect.width / 2;
-                const snapPoints = [
-                    minSide,                // Left lateral stop
-                    rect.width * 0.25,     // Left pane midpoint
-                    centerX,                // Main center
-                    rect.width * 0.75,     // Right pane midpoint
-                    rect.width - minSide    // Right lateral stop
-                ];
-
-                for (const p of snapPoints) {
-                    if (Math.abs(x - p) < snapThreshold) {
-                        x = p;
-                        break;
-                    }
-                }
+                // Edge-to-edge drag allowed. 
+                // Snap to edges if very close to facilitate closing
+                const snapEdge = 30;
+                if (x < snapEdge) x = 0;
+                if (x > rect.width - snapEdge) x = rect.width;
 
                 splitRatio = x / rect.width;
                 updateGeometry();
@@ -497,13 +671,19 @@
 
             const onMouseUp = () => {
                 isDragging = false;
+                document.body.classList.remove('is-resizing');
                 document.body.style.cursor = 'default';
                 window.removeEventListener('mousemove', onMouseMove);
                 window.removeEventListener('mouseup', onMouseUp);
+
+                // Commit state
+                updateViewModeState();
+                updateGeometry();
             };
 
             splitDivider.addEventListener('mousedown', (e) => {
                 isDragging = true;
+                document.body.classList.add('is-resizing');
                 document.body.style.cursor = 'col-resize';
                 window.addEventListener('mousemove', onMouseMove);
                 window.addEventListener('mouseup', onMouseUp);
@@ -520,13 +700,36 @@
 
             trigger.addEventListener('click', () => {
                 container.classList.toggle('container-panel-open');
-                // Allow transition to finish then update geometry (or observer will handle it)
             });
 
             splitTrigger.addEventListener('click', () => {
-                const becomingActive = !container.classList.contains('splitview-active');
-                container.classList.toggle('splitview-active');
-                startZipperAnimation(becomingActive);
+                const paneRight = document.getElementById('pane-right');
+
+                // Inject webview if missing
+                if (!document.getElementById('wv-right')) {
+                    const wv = document.createElement('webview');
+                    wv.id = 'wv-right';
+                    wv.src = 'http://localhost:3000';
+                    wv.setAttribute('allowpopups', '');
+                    paneRight.appendChild(wv);
+                }
+
+                if (viewMode === 'split') {
+                    // Split -> Go to Single Left
+                    animateSplitRatio(1.0);
+                } else {
+                    // Single (Left or Right) -> Go to Split
+                    animateSplitRatio(0.5);
+                }
+            });
+
+            // Ensure webview fills the container correctly on any initial load
+            const wvLeft = document.getElementById('wv-left');
+            wvLeft.addEventListener('did-finish-load', () => {
+                console.log('Main webview loaded localhost:3001');
+            });
+            wvLeft.addEventListener('did-fail-load', (e) => {
+                console.error('Main webview failed to load:', e.errorCode, e.errorDescription, e.validatedURL);
             });
         </script>
     </div>
