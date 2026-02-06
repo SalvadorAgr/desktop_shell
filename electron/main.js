@@ -8,9 +8,9 @@ function createWindow() {
     const isWindows = process.platform === 'win32';
 
     const windowConfig = {
-        width: 1250,
+        width: 1400,
         height: 700,
-        minWidth: 1250,
+        minWidth: 1400,
         minHeight: 700,
         frame: false,
         transparent: true,
@@ -28,7 +28,7 @@ function createWindow() {
         windowConfig.vibrancy = 'under-window';
         windowConfig.visualEffectState = 'active';
         windowConfig.titleBarStyle = 'hidden';
-        windowConfig.trafficLightPosition = { x: 15, y: 11 };
+        windowConfig.trafficLightPosition = { x: 15, y: 7 };
     }
 
     // Configuración específica para Windows

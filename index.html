@@ -38,7 +38,7 @@
 
         .canvas-task-container {
             position: absolute;
-            top: 35px;
+            top: 30px;
             left: 7px;
             right: 7px;
             bottom: 7px;
@@ -74,7 +74,7 @@
         }
 
         .container-panel-open .task-panel-wrapper {
-            width: 250px;
+            width: 300px;
         }
 
         .canvas-task-svg {
@@ -114,7 +114,7 @@
             position: fixed;
             left: 50%;
             transform: translateX(-50%);
-            width: 250px;
+            width: 300px;
             bottom: 0;
             height: 15px;
             z-index: 1200;
@@ -175,7 +175,7 @@
             position: relative;
             overflow: hidden;
             background: transparent;
-            border-radius: 5px;
+            border-radius: 10px;
         }
 
         .webview-pane webview {
@@ -244,7 +244,7 @@
         <div class="canvas-task-container" id="main-container">
             <div class="main-canvas-wrapper">
                 <div id="dock-hit-area"></div>
-                <svg class="canvas-task-svg" viewBox="0 0 1236 658" fill="none" xmlns="http://www.w3.org/2000/svg"
+                <svg class="canvas-task-svg" viewBox="0 0 1386 663" fill="none" xmlns="http://www.w3.org/2000/svg"
                     preserveAspectRatio="none">
                     <g clip-path="url(#clip0_595_14217)">
                         <path id="main-canvas-path" d="" fill="#0A0A0A" />
@@ -271,7 +271,7 @@
                     </g>
                 </svg>
 
-                <svg class="canvas-overlay-svg" viewBox="0 0 1236 658" fill="none" xmlns="http://www.w3.org/2000/svg"
+                <svg class="canvas-overlay-svg" viewBox="0 0 1386 663" fill="none" xmlns="http://www.w3.org/2000/svg"
                     preserveAspectRatio="none">
                     <!-- SplitView Separator -->
                     <g id="splitview-divider" style="display: none;">
@@ -372,7 +372,7 @@
             </div>
 
             <div class="task-panel-wrapper">
-                <svg class="task-panel-svg" viewBox="0 0 250 658" fill="none" xmlns="http://www.w3.org/2000/svg"
+                <svg class="task-panel-svg" viewBox="0 0 300 663" fill="none" xmlns="http://www.w3.org/2000/svg"
                     preserveAspectRatio="none">
                     <path id="task-panel-path" d="" fill="transparent" />
                 </svg>
@@ -486,7 +486,7 @@
                 svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
                 overlaySvg.setAttribute('viewBox', `0 0 ${w} ${h}`);
 
-                const L = 0, R = w, rad = 5, bottom = h - 1;
+                const L = 0, R = w, rad = 10, bottom = h - 1;
 
                 // Allow splitX to go fully edge-to-edge
                 let splitX = Math.round(w * splitRatio);
@@ -521,8 +521,8 @@
                 rightPaneMask.setAttribute('d', rightD);
 
                 // Task Panel
-                const taskH = container.querySelector('.task-panel-wrapper').offsetHeight || 658;
-                const taskW = 250, taskRad = 5, taskBottom = taskH - 1;
+                const taskH = container.querySelector('.task-panel-wrapper').offsetHeight || 663;
+                const taskW = 300, taskRad = 10, taskBottom = taskH - 1;
                 const taskD = `M 0 ${taskBottom - taskRad} V ${taskRad} Q 0 1 ${taskRad} 1 H ${taskW - taskRad} Q ${taskW} 1 ${taskW} ${taskRad} V ${taskBottom - taskRad} Q ${taskW} ${taskBottom} ${taskW - taskRad} ${taskBottom} H ${taskRad} Q 0 ${taskBottom} 0 ${taskBottom - taskRad} Z`;
                 if (taskPanelPath) taskPanelPath.setAttribute('d', taskD);
 
