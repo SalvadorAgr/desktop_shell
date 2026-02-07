@@ -29,6 +29,7 @@
             transform: translateX(-50%);
             z-index: 10;
             -webkit-app-region: no-drag;
+            display: none;
         }
 
         .notch-svg {
@@ -43,15 +44,17 @@
             right: 7px;
             bottom: 7px;
             display: flex;
-            justify-content: center;
-            align-items: center;
+            flex-direction: row;
+            overflow: hidden;
+            pointer-events: none;
             gap: 0;
+            z-index: 1000;
             transition: gap 0.5s cubic-bezier(0.4, 0, 0.2, 1);
             -webkit-app-region: no-drag;
         }
 
         .container-panel-open {
-            gap: 4px;
+            gap: 7px;
         }
 
         .main-canvas-wrapper {
@@ -73,7 +76,6 @@
             flex-shrink: 0;
             will-change: width;
             transform: translateZ(0);
-            /* Force GPU layer */
             backface-visibility: hidden;
         }
 
@@ -263,11 +265,131 @@
         body.is-resizing webview {
             pointer-events: none;
         }
+
+        #menu-bar {
+            position: absolute;
+            top: 0;
+            left: 80px;
+            right: 0;
+            height: 30px;
+            z-index: 6000;
+            pointer-events: auto;
+            -webkit-app-region: no-drag;
+        }
+
+        #menu-bar img {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: fill;
+            /* Hide the area that contains icons AND the original static clock (76% to 99%) */
+            mask: linear-gradient(90deg, #000 76%, transparent 76.5%, transparent 98.8%, #000 99.2%);
+            -webkit-mask: linear-gradient(90deg, #000 76%, transparent 76.5%, transparent 98.8%, #000 99.2%);
+        }
+
+        .splitview-active #menu-bar img {
+            /* Keep original clock hidden even in splitview to avoid overlap */
+            mask: linear-gradient(90deg, #000 91%, transparent 91.5%, transparent 98.8%, #000 99.2%);
+            -webkit-mask: linear-gradient(90deg, #000 91%, transparent 91.5%, transparent 98.8%, #000 99.2%);
+        }
+
+        #menu-bar-clock {
+            position: absolute;
+            top: 0;
+            right: 15px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+            font-size: 11px;
+            font-weight: 500;
+            z-index: 7000;
+            pointer-events: none;
+            text-shadow: 0 0 1px rgba(0, 0, 0, 0.2);
+        }
+
+        #toolbar-container {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 30px;
+            z-index: 6100;
+            display: none;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        #toolbar-container.active {
+            display: block;
+            opacity: 1;
+        }
+
+        #toolbar-svg-container {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: auto;
+            -webkit-app-region: no-drag;
+            /* Focus on buttons, avoiding the clock area carefully */
+            clip-path: inset(0 12.5% 0 76.5%);
+        }
+
+        #toolbar-svg-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: fill;
+            right: 160px;
+            /* Positioned before the clock */
+            width: 140px;
+            height: 30px;
+            z-index: 6100;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            -webkit-app-region: no-drag;
+        }
+
+        #toolbar-container.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 1;
+        }
+
+        #toolbar-container img {
+            height: 16px;
+            width: auto;
+        }
+
+        @keyframes toolbarFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
 
 <body>
-    <div class="window-container">
+    <div class="window-container" id="window-root">
+        <div id="menu-bar">
+            <img src="assets/svg/panel_apps/menu bar.svg" alt="Menu Bar" />
+            <div id="menu-bar-clock"></div>
+        </div>
+        <div id="toolbar-container">
+            <div id="toolbar-svg-container">
+                <img src="assets/svg/panel_apps/menu bar.svg" alt="Split Controls" />
+            </div>
+        </div>
         <div id="dock-backdrop"></div>
         <div class="notch-container">
             <svg class="notch-svg" width="300" height="20" viewBox="0 0 300 20" fill="none"
@@ -423,6 +545,26 @@
         </div>
 
         <script>
+            // Real-time Clock
+            const updateClock = () => {
+                const now = new Date();
+                const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+                const dayName = days[now.getDay()];
+                const monthName = months[now.getMonth()];
+                const dayNum = now.getDate();
+                let hours = now.getHours();
+                const minutes = now.getMinutes().toString().padStart(2, '0');
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12 || 12;
+
+                const clockStr = `${dayName} ${monthName} ${dayNum}  ${hours}:${minutes} ${ampm}`;
+                const clockEl = document.getElementById('menu-bar-clock');
+                if (clockEl) clockEl.textContent = clockStr;
+            };
+            setInterval(updateClock, 1000);
+            updateClock();
 
             const container = document.getElementById('main-container');
             const trigger = document.getElementById('panel-trigger');
@@ -564,7 +706,8 @@
             const startLoop = () => { if (!isLooping) { isLooping = true; requestAnimationFrame(animate); } };
 
             const onResize = () => {
-                cachedW = wrapper.offsetWidth; cachedH = wrapper.offsetHeight;
+                const rect = wrapper.getBoundingClientRect();
+                cachedW = rect.width; cachedH = rect.height;
                 updateGeometry(); startLoop();
             };
             const rObs = new ResizeObserver(onResize);
@@ -586,7 +729,8 @@
             });
 
             window.addEventListener('load', () => {
-                cachedW = wrapper.offsetWidth; cachedH = wrapper.offsetHeight;
+                const rect = wrapper.getBoundingClientRect();
+                cachedW = rect.width; cachedH = rect.height;
                 initParticles(cachedW, cachedH);
                 populateAppGrid();
             });
@@ -634,9 +778,23 @@
 
             const animateSplitRatio = (targetRatio) => {
                 splitRatioAnimationActive = true;
-                const duration = 500; const startTime = performance.now();
+                const duration = 1200; // Even slower for smoother feel
+                const startTime = performance.now();
                 const startRatio = splitRatio;
                 startLoop();
+
+                // Trigger states early
+                const root = document.getElementById('window-root');
+                const tbSvg = document.getElementById('panel-toolbar');
+                if (targetRatio < 0.9) {
+                    if (root) root.classList.add('splitview-active');
+                    if (tbSvg) {
+                        tbSvg.classList.remove('active');
+                        void tbSvg.offsetWidth;
+                        tbSvg.classList.add('active');
+                    }
+                }
+
                 const step = (now) => {
                     const elapsed = now - startTime;
                     const p = Math.min(elapsed / duration, 1);
@@ -652,9 +810,38 @@
             };
 
             const updateViewModeState = () => {
-                if (splitRatio >= 0.99) { viewMode = 'single-left'; container.classList.remove('splitview-active'); }
-                else if (splitRatio <= 0.01) { viewMode = 'single-right'; container.classList.remove('splitview-active'); }
-                else { viewMode = 'split'; container.classList.add('splitview-active'); }
+                const tbContainer = document.getElementById('toolbar-container');
+                const tbSvg = document.getElementById('panel-toolbar');
+                const root = document.getElementById('window-root');
+
+                // Toolbar logic removed as per user request to replace with Menu Bar
+                if (splitRatio >= 0.99) {
+                    viewMode = 'single-left';
+                    container.classList.remove('splitview-active');
+                    root.classList.remove('splitview-active');
+                    const tbContainer = document.getElementById('toolbar-container');
+                    if (tbContainer) {
+                        tbContainer.classList.remove('active');
+                        setTimeout(() => {
+                            if (!tbContainer.classList.contains('active')) {
+                                tbContainer.style.display = 'none';
+                            }
+                        }, 300);
+                    }
+                }
+                else {
+                    viewMode = splitRatio <= 0.01 ? 'single-right' : 'split';
+                    container.classList.add('splitview-active');
+                    root.classList.add('splitview-active');
+
+                    const tbContainer = document.getElementById('toolbar-container');
+                    if (tbContainer) {
+                        tbContainer.style.display = 'flex';
+                        // Force reflow
+                        tbContainer.offsetHeight;
+                        tbContainer.classList.add('active');
+                    }
+                }
             };
 
             const onMouseMove = (e) => {
