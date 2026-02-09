@@ -48,7 +48,7 @@
             overflow: hidden;
             pointer-events: none;
             gap: 0;
-            z-index: 1000;
+            z-index: 5000;
             transition: gap 0.5s cubic-bezier(0.4, 0, 0.2, 1);
             -webkit-app-region: no-drag;
         }
@@ -110,7 +110,8 @@
             transform: scale3d(1.167, 1.167, 1);
         }
 
-        .dock-icon-area {
+        .dock-icon-area,
+        .toolbar-hit-area {
             fill: transparent;
             cursor: pointer;
             pointer-events: auto;
@@ -123,7 +124,7 @@
             width: 300px;
             bottom: 0;
             height: 15px;
-            z-index: 1200;
+            z-index: 4700;
             pointer-events: auto;
             background: transparent;
             cursor: default;
@@ -132,12 +133,17 @@
         #dock-elements {
             pointer-events: none;
             transition: opacity 0.2s ease;
-            z-index: 1150;
         }
 
         #dock-elements .dock-icon {
             pointer-events: none;
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body.dock-open #dock-elements,
+        body.dock-open .dock-icon,
+        body.dock-open .dock-icon-area {
+            pointer-events: auto !important;
         }
 
         .app-grid {
@@ -175,7 +181,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            z-index: 900;
+            z-index: 4550;
             background: transparent;
             display: none;
             pointer-events: auto;
@@ -232,7 +238,7 @@
             width: 100%;
             height: 100%;
             display: block;
-            z-index: 1100;
+            z-index: 4600;
             pointer-events: none;
         }
 
@@ -269,12 +275,206 @@
         #menu-bar {
             position: absolute;
             top: 0;
-            left: 80px;
+            left: 0;
             right: 0;
             height: 30px;
             z-index: 6000;
-            pointer-events: auto;
+            pointer-events: none;
             -webkit-app-region: no-drag;
+            display: flex;
+            align-items: center;
+        }
+
+        #add-tab-trigger {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            background: transparent;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+            margin-left: 4px;
+            flex-shrink: 0;
+            position: sticky;
+            right: 0;
+            z-index: 7005;
+        }
+
+        #add-tab-trigger::before,
+        #add-tab-trigger::after {
+            content: '';
+            position: absolute;
+            background: white;
+            border-radius: 1px;
+        }
+
+        #add-tab-trigger::before {
+            width: 10px;
+            height: 1.5px;
+        }
+
+        #add-tab-trigger::after {
+            width: 1.5px;
+            height: 10px;
+        }
+
+        #add-tab-trigger:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+        }
+
+        #tabs-container {
+            position: absolute;
+            left: 80px;
+            /* Positioned after traffic lights */
+            right: 380px;
+            /* Space for right-side elements (Toolbar + Clock) */
+            top: 6px;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            z-index: 7000;
+            overflow: hidden;
+            pointer-events: auto;
+        }
+
+        #menu-bar-reloj {
+            position: absolute;
+            right: 33px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 130px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            pointer-events: none;
+            color: white;
+            font-size: 11px;
+            font-weight: 500;
+            text-shadow: 0 1px 4px rgba(204, 204, 204, 0.4);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            letter-spacing: 0.2px;
+        }
+
+        #menu-bar-toolbar {
+            position: absolute;
+            right: 155px;
+            /* right (20) + clock width (130) + small gap (5) */
+            top: 50%;
+            transform: translateY(-50%);
+            width: 170px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            pointer-events: none;
+            opacity: 0;
+            z-index: 7010;
+            transition: opacity 0.3s ease;
+        }
+
+        #menu-bar-toolbar svg g {
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        #menu-bar-toolbar svg g:hover {
+            opacity: 0.7;
+        }
+
+        #menu-bar-reloj-text {
+            white-space: nowrap;
+            text-transform: capitalize;
+        }
+
+        .menu-tab {
+            padding: 0 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px 6px 0 0;
+            color: white;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: none;
+            white-space: nowrap;
+            min-width: 30px;
+            max-width: 150px;
+            flex: 0 1 auto;
+            z-index: 7001;
+            overflow: hidden;
+        }
+
+        .tab-icon-container {
+            width: 15px;
+            height: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 10;
+        }
+
+        .tab-title {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            flex: 1;
+            position: relative;
+            z-index: 1;
+        }
+
+        .menu-tab.active {
+            background: rgba(255, 255, 255, 0.2);
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .menu-tab:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .tab-icon {
+            max-width: 100%;
+            max-height: 100%;
+            display: none;
+            object-fit: contain;
+            image-rendering: -webkit-optimize-contrast;
+        }
+
+        .tab-icon.has-icon {
+            display: block;
+        }
+
+        .tab-close {
+            margin-left: 8px;
+            opacity: 0.5;
+            font-size: 14px;
+        }
+
+        .tab-close:hover {
+            opacity: 1;
+        }
+
+        .webview-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+        }
+
+        .webview-container.active {
+            display: block;
         }
 
         #menu-bar img {
@@ -288,38 +488,17 @@
         }
 
         .splitview-active #menu-bar img {
-            /* Keep original clock hidden even in splitview to avoid overlap */
-            mask: linear-gradient(90deg, #000 91%, transparent 91.5%, transparent 98.8%, #000 99.2%);
-            -webkit-mask: linear-gradient(90deg, #000 91%, transparent 91.5%, transparent 98.8%, #000 99.2%);
+            /* Remove masking that causes visual overlap artifacts */
+            mask: none;
+            -webkit-mask: none;
         }
 
         #menu-bar-clock {
-            position: absolute;
-            top: 0;
-            right: 15px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            color: #ffffff;
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
-            font-size: 11px;
-            font-weight: 500;
-            z-index: 7000;
-            pointer-events: none;
-            text-shadow: 0 0 1px rgba(0, 0, 0, 0.2);
+            display: none;
         }
 
         #toolbar-container {
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 100%;
-            height: 30px;
-            z-index: 6100;
-            display: none;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.3s ease;
+            display: none !important;
         }
 
         #toolbar-container.active {
@@ -376,519 +555,873 @@
                 transform: translateY(0);
             }
         }
+
+        /* Search Modal Styles */
+        #search-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        .search-container {
+            width: 500px;
+            background: rgba(30, 30, 30, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        #search-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 20px;
+            font-weight: 300;
+            outline: none;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, sans-serif;
+            text-align: center;
+        }
+
+        #search-input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
     </style>
 </head>
 
 <body>
-    <div class="window-container" id="window-root">
-        <div id="menu-bar">
-            <img src="assets/svg/panel_apps/menu bar.svg" alt="Menu Bar" />
-            <div id="menu-bar-clock"></div>
+    <div id="menu-bar">
+        <div id="tabs-container">
+            <div id="add-tab-trigger" onclick="addNewTab('https://www.google.com')"></div>
         </div>
-        <div id="toolbar-container">
-            <div id="toolbar-svg-container">
-                <img src="assets/svg/panel_apps/menu bar.svg" alt="Split Controls" />
-            </div>
-        </div>
-        <div id="dock-backdrop"></div>
-        <div class="notch-container">
-            <svg class="notch-svg" width="300" height="20" viewBox="0 0 300 20" fill="none"
-                xmlns="http://www.w3.org/2000/svg">
-                <path d="M 0 0 C 12.5 0 12.5 20 25 20 H 275 C 287.5 20 287.5 0 300 0 Z" fill="#0A0A0A" />
+        <div id="menu-bar-toolbar">
+            <svg width="170" height="30" viewBox="0 0 170 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <line x1="11.1072" y1="4.10723" x2="11.1072" y2="23.8928" stroke="url(#paint0_linear_735_22659)"
+                    stroke-width="0.214453" stroke-linecap="round" />
+
+                <!-- Search Icon Area (11.1 to 48.1) -->
+                <g id="toolbar-search">
+                    <rect x="11.1" y="0" width="37" height="30" fill="white" fill-opacity="0"
+                        style="cursor: pointer;" />
+                    <circle cx="28.875" cy="14.375" r="3.75" stroke="#D1D1D1" stroke-width="0.625" />
+                    <path d="M34.5 20L32.625 18.125" stroke="#D1D1D1" stroke-width="0.625" stroke-linecap="round" />
+                </g>
+
+                <line x1="48.1072" y1="4.10723" x2="48.1072" y2="23.8928" stroke="url(#paint1_linear_735_22659)"
+                    stroke-width="0.214453" stroke-linecap="round" />
+
+                <!-- Share Icon Area (48.1 to 85.1) -->
+                <g id="toolbar-share">
+                    <rect x="48.1" y="0" width="37" height="30" fill="white" fill-opacity="0"
+                        style="cursor: pointer;" />
+                    <path
+                        d="M71.5 12.5L71.721 12.721L71.9419 12.5L71.721 12.279L71.5 12.5ZM68.375 19.6875C68.5476 19.6875 68.6875 19.5476 68.6875 19.375C68.6875 19.2024 68.5476 19.0625 68.375 19.0625L68.375 19.375L68.375 19.6875ZM68.375 15.625L68.596 15.846L71.721 12.721L71.5 12.5L71.279 12.279L68.154 15.404L68.375 15.625ZM71.5 12.5L71.721 12.279L68.596 9.15403L68.375 9.375L68.154 9.59597L71.279 12.721L71.5 12.5ZM71.5 12.5L71.5 12.1875L64.9375 12.1875L64.9375 12.5L64.9375 12.8125L71.5 12.8125L71.5 12.5ZM64.9375 19.375L64.9375 19.6875L68.375 19.6875L68.375 19.375L68.375 19.0625L64.9375 19.0625L64.9375 19.375ZM61.5 15.9375L61.1875 15.9375C61.1875 18.0086 62.8664 19.6875 64.9375 19.6875L64.9375 19.375L64.9375 19.0625C63.2116 19.0625 61.8125 17.6634 61.8125 15.9375L61.5 15.9375ZM64.9375 12.5L64.9375 12.1875C62.8664 12.1875 61.1875 13.8664 61.1875 15.9375L61.5 15.9375L61.8125 15.9375C61.8125 14.2116 63.2116 12.8125 64.9375 12.8125L64.9375 12.5Z"
+                        fill="#D1D1D1" />
+                </g>
+
+                <line x1="85.1072" y1="4.10723" x2="85.1072" y2="23.8928" stroke="url(#paint2_linear_735_22659)"
+                    stroke-width="0.214453" stroke-linecap="round" />
+
+                <!-- Refresh Icon Area (85.1 to 122.1) -->
+                <g id="toolbar-refresh">
+                    <rect x="85.1" y="0" width="37" height="30" fill="white" fill-opacity="0"
+                        style="cursor: pointer;" />
+                    <path d="M104.515 15.7239L102.015 18.2239L104.515 20.7239" stroke="#D1D1D1"
+                        stroke-width="0.550957" />
+                    <path
+                        d="M99.4762 16.0361C98.9805 15.1776 98.7911 14.1762 98.939 13.196C99.0869 12.2157 99.5633 11.3148 100.29 10.6407C101.017 9.96662 101.951 9.55939 102.94 9.48573C103.929 9.41206 104.913 9.67633 105.732 10.2352C106.55 10.7941 107.155 11.6145 107.447 12.562C107.738 13.5095 107.699 14.528 107.336 15.4505C106.973 16.373 106.308 17.1448 105.449 17.6397C104.59 18.1345 103.588 18.3229 102.608 18.174"
+                        stroke="#D1D1D1" stroke-width="0.550957" stroke-linecap="round" />
+                </g>
+
+                <line x1="122.107" y1="4.10723" x2="122.107" y2="23.8928" stroke="url(#paint3_linear_735_22659)"
+                    stroke-width="0.214453" stroke-linecap="round" />
+
+                <!-- Action/Forward Icon Area (122.1 to 159.1) -->
+                <g id="toolbar-action">
+                    <rect x="122.1" y="0" width="37" height="30" fill="white" fill-opacity="0"
+                        style="cursor: pointer;" />
+                    <path
+                        d="M135.5 17.5L135.279 17.279L135.058 17.5L135.279 17.721L135.5 17.5ZM138.625 10.3125C138.452 10.3125 138.312 10.4524 138.312 10.625C138.312 10.7976 138.452 10.9375 138.625 10.9375V10.625V10.3125ZM138.625 14.375L138.404 14.154L135.279 17.279L135.5 17.5L135.721 17.721L138.846 14.596L138.625 14.375ZM135.5 17.5L135.279 17.721L138.404 20.846L138.625 20.625L138.846 20.404L135.721 17.279L135.5 17.5ZM135.5 17.5V17.8125H142.062V17.5V17.1875H135.5V17.5ZM142.062 10.625V10.3125H138.625V10.625V10.9375H142.062V10.625ZM145.5 14.0625H145.812C145.812 11.9914 144.134 10.3125 142.062 10.3125V10.625V10.9375C143.788 10.9375 145.187 12.3366 145.187 14.0625H145.5ZM142.062 17.5V17.8125C144.134 17.8125 145.812 16.1336 145.812 14.0625H145.5H145.187C145.187 15.7884 143.788 17.1875 142.062 17.1875V17.5Z"
+                        fill="#D1D1D1" />
+                </g>
+
+                <line x1="159.107" y1="4.10723" x2="159.107" y2="23.8928" stroke="url(#paint4_linear_735_22659)"
+                    stroke-width="0.214453" stroke-linecap="round" />
+                <defs>
+                    <linearGradient id="paint0_linear_735_22659" x1="10.5" y1="4" x2="10.5" y2="24"
+                        gradientUnits="userSpaceOnUse">
+                        <stop stop-color="white" stop-opacity="0" />
+                        <stop offset="0.480769" stop-color="#CACACA" />
+                        <stop offset="1" stop-color="#999999" stop-opacity="0" />
+                    </linearGradient>
+                    <linearGradient id="paint1_linear_735_22659" x1="47.5" y1="4" x2="47.5" y2="24"
+                        gradientUnits="userSpaceOnUse">
+                        <stop stop-color="white" stop-opacity="0" />
+                        <stop offset="0.480769" stop-color="#CACACA" />
+                        <stop offset="1" stop-color="#999999" stop-opacity="0" />
+                    </linearGradient>
+                    <linearGradient id="paint2_linear_735_22659" x1="84.5" y1="4" x2="84.5" y2="24"
+                        gradientUnits="userSpaceOnUse">
+                        <stop stop-color="white" stop-opacity="0" />
+                        <stop offset="0.480769" stop-color="#CACACA" />
+                        <stop offset="1" stop-color="#999999" stop-opacity="0" />
+                    </linearGradient>
+                    <linearGradient id="paint3_linear_735_22659" x1="121.5" y1="4" x2="121.5" y2="24"
+                        gradientUnits="userSpaceOnUse">
+                        <stop stop-color="white" stop-opacity="0" />
+                        <stop offset="0.480769" stop-color="#CACACA" />
+                        <stop offset="1" stop-color="#999999" stop-opacity="0" />
+                    </linearGradient>
+                    <linearGradient id="paint4_linear_735_22659" x1="158.5" y1="4" x2="158.5" y2="24"
+                        gradientUnits="userSpaceOnUse">
+                        <stop stop-color="white" stop-opacity="0" />
+                        <stop offset="0.480769" stop-color="#CACACA" />
+                        <stop offset="1" stop-color="#999999" stop-opacity="0" />
+                    </linearGradient>
+                </defs>
             </svg>
         </div>
-        <div class="canvas-task-container" id="main-container">
-            <div class="main-canvas-wrapper">
-                <div id="dock-hit-area"></div>
-                <svg class="canvas-task-svg" viewBox="0 0 1386 663" fill="none" xmlns="http://www.w3.org/2000/svg"
-                    preserveAspectRatio="none">
-                    <g clip-path="url(#clip0_595_14217)">
-                        <path id="main-canvas-path" d="" fill="#0A0A0A" />
-                        <defs>
-                            <clipPath id="clip0_595_14217">
-                                <rect width="100%" height="100%" fill="white" />
-                            </clipPath>
-                            <mask id="split-mask">
-                                <g id="mask-full-group">
-                                    <path id="mask-full" d="" fill="white" />
-                                </g>
-                                <g id="mask-split-group" style="display: none;">
-                                    <path id="pane-left-mask-path" d="" fill="white" />
-                                    <path id="pane-right-mask-path" d="" fill="white" />
-                                </g>
-                            </mask>
-                            <clipPath id="zipper-clip-split">
-                                <rect id="zipper-rect-split" x="0" y="0" width="100%" height="0" />
-                            </clipPath>
-                            <clipPath id="zipper-clip-full">
-                                <rect id="zipper-rect-full" x="0" y="0" width="100%" height="100%" />
-                            </clipPath>
-                        </defs>
-                    </g>
-                </svg>
-
-                <svg class="canvas-overlay-svg" viewBox="0 0 1386 663" fill="none" xmlns="http://www.w3.org/2000/svg"
-                    preserveAspectRatio="none">
-                    <!-- SplitView Separator -->
-                    <g id="splitview-divider" style="display: none;">
-                        <rect x="-2" y="0" width="11" height="100%" fill="transparent" />
-                        <rect id="divider-handle" x="1" y="289.5" width="2" height="50" rx="1" fill="#999999" />
-                    </g>
-
-                    <g id="dock-elements">
-                        <!-- Left Separator -->
-                        <line x1="537" y1="633.107" x2="537" y2="652.893" stroke="url(#paint0_linear_595_14217)"
-                            stroke-width="0.214453" stroke-linecap="round" />
-
-                        <!-- Icon 1: SplitView Trigger (Center 564, gap 12px) -->
-                        <g class="dock-icon" id="splitview-trigger">
-                            <rect class="dock-icon-area" x="549" y="628" width="30" height="30" />
-                            <path
-                                d="M562.571 648.5H560.339C559.599 648.5 559 647.9 559 647.161V639.125C559 638.385 559.599 637.786 560.339 637.786H562.571"
-                                stroke="#D1D1D1" stroke-width="0.714286" stroke-linecap="round" fill="none" />
-                            <path
-                                d="M565.429 648.5H567.661C568.4 648.5 569 647.9 569 647.161V639.125C569 638.385 568.4 637.786 567.661 637.786H565.429"
-                                stroke="#D1D1D1" stroke-width="0.714286" stroke-linecap="round" fill="none" />
-                            <path d="M564 636V650.286" stroke="#D1D1D1" stroke-width="0.714286" stroke-linecap="round"
-                                fill="none" />
-                        </g>
-
-                        <!-- Mid-Left Separator -->
-                        <line x1="591" y1="633.107" x2="591" y2="652.893" stroke="url(#paint1_linear_595_14217)"
-                            stroke-width="0.214453" stroke-linecap="round" />
-
-                        <!-- Icon 2: Home (Center 618, gap 12px) -->
-                        <g class="dock-icon">
-                            <rect class="dock-icon-area" x="603" y="628" width="30" height="30" />
-                            <path
-                                d="M612.65 643.242C612.65 642.29 612.65 641.814 612.856 641.396C613.062 640.977 613.448 640.668 614.221 640.048L614.971 639.447C616.369 638.328 617.068 637.768 617.9 637.768C618.732 637.768 619.431 638.328 620.829 639.447L621.579 640.048C622.352 640.668 622.738 640.977 622.944 641.396C623.15 641.814 623.15 642.29 623.15 643.242V646.214C623.15 647.536 623.15 648.197 622.711 648.607C622.271 649.018 621.564 649.018 620.15 649.018H615.65C614.236 649.018 613.529 649.018 613.089 648.607C612.65 648.197 612.65 647.536 612.65 646.214V643.242Z"
-                                stroke="#D1D1D1" stroke-width="0.850003" fill="none" />
-                            <path
-                                d="M619.4 649.018V645.941C619.4 645.569 619.099 645.268 618.727 645.268H617.073C616.701 645.268 616.4 645.569 616.4 645.941V649.018"
-                                stroke="#D1D1D1" stroke-width="0.850003" stroke-linecap="round" stroke-linejoin="round"
-                                fill="none" />
-                        </g>
-
-                        <!-- Mid-Right Separator -->
-                        <line x1="645" y1="633.107" x2="645" y2="652.893" stroke="url(#paint2_linear_595_14217)"
-                            stroke-width="0.214453" stroke-linecap="round" />
-
-                        <!-- Icon 3: Panel Trigger (Center 672, gap 12px) -->
-                        <g class="dock-icon" id="panel-trigger">
-                            <rect class="dock-icon-area" x="657" y="628" width="30" height="30" />
-                            <path
-                                d="M671.643 648.643H667.982C667.242 648.643 666.643 648.043 666.643 647.304V638.982C666.643 638.242 667.242 637.643 667.982 637.643H671.643"
-                                stroke="#D1D1D1" stroke-width="0.714286" stroke-linecap="round" fill="none" />
-                            <path
-                                d="M672.643 648.643H676.304C677.043 648.643 677.643 648.043 677.643 647.304V638.982C677.643 638.242 677.043 637.643 676.304 637.643H672.643"
-                                stroke="#D1D1D1" stroke-width="0.714286" stroke-linecap="round" fill="none" />
-                            <rect x="672.5" y="639" width="4" height="8" rx="0.714286" fill="#D1D1D1" />
-                        </g>
-
-                        <!-- Right Separator -->
-                        <line x1="699" y1="633.107" x2="699" y2="652.893" stroke="url(#paint3_linear_595_14217)"
-                            stroke-width="0.214453" stroke-linecap="round" />
-                    </g>
+        <div id="menu-bar-reloj">
+            <div id="menu-bar-reloj-text"></div>
+        </div>
+    </div>
+    <div id="toolbar-container">
+    </div>
+    <div class="notch-container">
+        <svg class="notch-svg" width="300" height="20" viewBox="0 0 300 20" fill="none"
+            xmlns="http://www.w3.org/2000/svg">
+            <path d="M 0 0 C 12.5 0 12.5 20 25 20 H 275 C 287.5 20 287.5 0 300 0 Z" fill="#0A0A0A" />
+        </svg>
+    </div>
+    <div id="search-modal">
+        <div class="search-container">
+            <input type="text" id="search-input" placeholder="¿Qué quieres buscar?" autocomplete="off">
+        </div>
+    </div>
+    <div class="canvas-task-container" id="main-container">
+        <div class="main-canvas-wrapper">
+            <div id="dock-hit-area"></div>
+            <div id="dock-backdrop"></div>
+            <svg class="canvas-task-svg" viewBox="0 0 1386 663" fill="none" xmlns="http://www.w3.org/2000/svg"
+                preserveAspectRatio="none">
+                <g clip-path="url(#clip0_595_14217)">
+                    <path id="main-canvas-path" d="" fill="#0A0A0A" />
                     <defs>
-                        <linearGradient id="paint0_linear_595_14217" x1="539" y1="633" x2="539" y2="653"
-                            gradientUnits="userSpaceOnUse">
-                            <stop stop-color="white" stop-opacity="0" />
-                            <stop offset="0.480769" stop-color="#CACACA" />
-                            <stop offset="1" stop-color="#999999" stop-opacity="0" />
-                        </linearGradient>
-                        <linearGradient id="paint1_linear_595_14217" x1="602" y1="633" x2="602" y2="653"
-                            gradientUnits="userSpaceOnUse">
-                            <stop stop-color="white" stop-opacity="0" />
-                            <stop offset="0.480769" stop-color="#CACACA" />
-                            <stop offset="1" stop-color="#999999" stop-opacity="0" />
-                        </linearGradient>
-                        <linearGradient id="paint2_linear_595_14217" x1="649" y1="633" x2="649" y2="653"
-                            gradientUnits="userSpaceOnUse">
-                            <stop stop-color="white" stop-opacity="0" />
-                            <stop offset="0.480769" stop-color="#CACACA" />
-                            <stop offset="1" stop-color="#999999" stop-opacity="0" />
-                        </linearGradient>
-                        <linearGradient id="paint3_linear_595_14217" x1="696" y1="633" x2="696" y2="653"
-                            gradientUnits="userSpaceOnUse">
-                            <stop stop-color="white" stop-opacity="0" />
-                            <stop offset="0.480769" stop-color="#CACACA" />
-                            <stop offset="1" stop-color="#999999" stop-opacity="0" />
-                        </linearGradient>
+                        <clipPath id="clip0_595_14217">
+                            <rect width="100%" height="100%" fill="white" />
+                        </clipPath>
+                        <mask id="split-mask">
+                            <g id="mask-full-group">
+                                <path id="mask-full" d="" fill="white" />
+                            </g>
+                            <g id="mask-split-group" style="display: none;">
+                                <path id="pane-left-mask-path" d="" fill="white" />
+                                <path id="pane-right-mask-path" d="" fill="white" />
+                            </g>
+                        </mask>
+                        <clipPath id="zipper-clip-split">
+                            <rect id="zipper-rect-split" x="0" y="0" width="100%" height="0" />
+                        </clipPath>
+                        <clipPath id="zipper-clip-full">
+                            <rect id="zipper-rect-full" x="0" y="0" width="100%" height="100%" />
+                        </clipPath>
                     </defs>
-                </svg>
-                <div class="panes-container">
-                    <div id="pane-left" class="webview-pane">
-                        <webview id="wv-left" src="http://localhost:3001" allowpopups
-                            useragent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36">
-                        </webview>
-                    </div>
-                    <div class="spacer"></div>
-                    <div id="pane-right" class="webview-pane">
-                        <!-- Content injected via JS -->
-                    </div>
-                </div>
-            </div>
+                </g>
+            </svg>
 
-            <div class="task-panel-wrapper" style="position: relative;">
-                <img src="assets/svg/panel_apps/content.svg"
-                    style="width: 300px; height: 100%; flex-shrink: 0; display: block;" alt="Task Panel Background" />
-                <img src="assets/svg/panel_apps/pestañas.svg"
-                    style="position: absolute; top: 20px; left: 50%; transform: translateX(-50%); width: 250px; height: 20px; z-index: 2;"
-                    alt="Panel Tabs" />
-                <img src="assets/svg/panel_apps/line.svg"
-                    style="position: absolute; top: 60px; left: 50%; transform: translateX(-50%); width: 221px; height: 9px; z-index: 2;"
-                    alt="Panel Divider" />
-                <img src="assets/svg/panel_apps/search.svg"
-                    style="position: absolute; top: 80px; left: 50%; transform: translateX(-50%); width: 250px; height: 20px; z-index: 2;"
-                    alt="Search Bar" />
+            <svg class="canvas-overlay-svg" viewBox="0 0 1386 663" fill="none" xmlns="http://www.w3.org/2000/svg"
+                preserveAspectRatio="none">
+                <!-- SplitView Separator -->
+                <g id="splitview-divider" style="display: none;">
+                    <rect x="-2" y="0" width="11" height="100%" fill="transparent" />
+                    <rect id="divider-handle" x="1" y="289.5" width="2" height="50" rx="1" fill="#999999" />
+                </g>
+
+                <g id="dock-elements">
+                    <!-- Left Separator -->
+                    <line x1="537" y1="633.107" x2="537" y2="652.893" stroke="url(#paint0_linear_595_14217)"
+                        stroke-width="0.214453" stroke-linecap="round" />
+
+                    <!-- Icon 1: SplitView Trigger (Center 564, gap 12px) -->
+                    <g class="dock-icon" id="splitview-trigger">
+                        <rect class="dock-icon-area" x="549" y="628" width="30" height="30" />
+                        <path
+                            d="M562.571 648.5H560.339C559.599 648.5 559 647.9 559 647.161V639.125C559 638.385 559.599 637.786 560.339 637.786H562.571"
+                            stroke="#D1D1D1" stroke-width="0.714286" stroke-linecap="round" fill="none" />
+                        <path
+                            d="M565.429 648.5H567.661C568.4 648.5 569 647.9 569 647.161V639.125C569 638.385 568.4 637.786 567.661 637.786H565.429"
+                            stroke="#D1D1D1" stroke-width="0.714286" stroke-linecap="round" fill="none" />
+                        <path d="M564 636V650.286" stroke="#D1D1D1" stroke-width="0.714286" stroke-linecap="round"
+                            fill="none" />
+                    </g>
+
+                    <!-- Mid-Left Separator -->
+                    <line x1="591" y1="633.107" x2="591" y2="652.893" stroke="url(#paint1_linear_595_14217)"
+                        stroke-width="0.214453" stroke-linecap="round" />
+
+                    <!-- Icon 2: Home (Center 618, gap 12px) -->
+                    <g class="dock-icon" id="home-trigger">
+                        <rect class="dock-icon-area" x="603" y="628" width="30" height="30" />
+                        <path
+                            d="M612.65 643.242C612.65 642.29 612.65 641.814 612.856 641.396C613.062 640.977 613.448 640.668 614.221 640.048L614.971 639.447C616.369 638.328 617.068 637.768 617.9 637.768C618.732 637.768 619.431 638.328 620.829 639.447L621.579 640.048C622.352 640.668 622.738 640.977 622.944 641.396C623.15 641.814 623.15 642.29 623.15 643.242V646.214C623.15 647.536 623.15 648.197 622.711 648.607C622.271 649.018 621.564 649.018 620.15 649.018H615.65C614.236 649.018 613.529 649.018 613.089 648.607C612.65 648.197 612.65 647.536 612.65 646.214V643.242Z"
+                            stroke="#D1D1D1" stroke-width="0.850003" fill="none" />
+                        <path
+                            d="M619.4 649.018V645.941C619.4 645.569 619.099 645.268 618.727 645.268H617.073C616.701 645.268 616.4 645.569 616.4 645.941V649.018"
+                            stroke="#D1D1D1" stroke-width="0.850003" stroke-linecap="round" stroke-linejoin="round"
+                            fill="none" />
+                    </g>
+
+                    <!-- Mid-Right Separator -->
+                    <line x1="645" y1="633.107" x2="645" y2="652.893" stroke="url(#paint2_linear_595_14217)"
+                        stroke-width="0.214453" stroke-linecap="round" />
+
+                    <!-- Icon 3: Panel Trigger (Center 672, gap 12px) -->
+                    <g class="dock-icon" id="panel-trigger">
+                        <rect class="dock-icon-area" x="657" y="628" width="30" height="30" />
+                        <path
+                            d="M671.643 648.643H667.982C667.242 648.643 666.643 648.043 666.643 647.304V638.982C666.643 638.242 667.242 637.643 667.982 637.643H671.643"
+                            stroke="#D1D1D1" stroke-width="0.714286" stroke-linecap="round" fill="none" />
+                        <path
+                            d="M672.643 648.643H676.304C677.043 648.643 677.643 648.043 677.643 647.304V638.982C677.643 638.242 677.043 637.643 676.304 637.643H672.643"
+                            stroke="#D1D1D1" stroke-width="0.714286" stroke-linecap="round" fill="none" />
+                        <rect x="672.5" y="639" width="4" height="8" rx="0.714286" fill="#D1D1D1" />
+                    </g>
+
+                    <!-- Right Separator -->
+                    <line x1="699" y1="633.107" x2="699" y2="652.893" stroke="url(#paint3_linear_595_14217)"
+                        stroke-width="0.214453" stroke-linecap="round" />
+                </g>
+                <defs>
+                    <linearGradient id="paint0_linear_595_14217" x1="539" y1="633" x2="539" y2="653"
+                        gradientUnits="userSpaceOnUse">
+                        <stop stop-color="white" stop-opacity="0" />
+                        <stop offset="0.480769" stop-color="#CACACA" />
+                        <stop offset="1" stop-color="#999999" stop-opacity="0" />
+                    </linearGradient>
+                    <linearGradient id="paint1_linear_595_14217" x1="602" y1="633" x2="602" y2="653"
+                        gradientUnits="userSpaceOnUse">
+                        <stop stop-color="white" stop-opacity="0" />
+                        <stop offset="0.480769" stop-color="#CACACA" />
+                        <stop offset="1" stop-color="#999999" stop-opacity="0" />
+                    </linearGradient>
+                    <linearGradient id="paint2_linear_595_14217" x1="649" y1="633" x2="649" y2="653"
+                        gradientUnits="userSpaceOnUse">
+                        <stop stop-color="white" stop-opacity="0" />
+                        <stop offset="0.480769" stop-color="#CACACA" />
+                        <stop offset="1" stop-color="#999999" stop-opacity="0" />
+                    </linearGradient>
+                    <linearGradient id="paint3_linear_595_14217" x1="696" y1="633" x2="696" y2="653"
+                        gradientUnits="userSpaceOnUse">
+                        <stop stop-color="white" stop-opacity="0" />
+                        <stop offset="0.480769" stop-color="#CACACA" />
+                        <stop offset="1" stop-color="#999999" stop-opacity="0" />
+                    </linearGradient>
+                </defs>
+            </svg>
+            <div class="panes-container">
+                <div id="pane-left" class="webview-pane">
+                    <webview id="wv-left" src="http://localhost:3001" allowpopups
+                        useragent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36">
+                    </webview>
+                </div>
+                <div class="spacer"></div>
+                <div id="pane-right" class="webview-pane">
+                    <!-- Content injected via JS -->
+                </div>
             </div>
         </div>
 
-        <script>
-            // Real-time Clock
-            const updateClock = () => {
-                const now = new Date();
-                const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-                const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        <div class="task-panel-wrapper" style="position: relative;">
+            <img src="assets/svg/panel_apps/content.svg"
+                style="width: 300px; height: 100%; flex-shrink: 0; display: block;" alt="Task Panel Background" />
+            <img src="assets/svg/panel_apps/pestañas.svg"
+                style="position: absolute; top: 20px; left: 50%; transform: translateX(-50%); width: 250px; height: 20px; z-index: 2;"
+                alt="Panel Tabs" />
+            <img src="assets/svg/panel_apps/line.svg"
+                style="position: absolute; top: 60px; left: 50%; transform: translateX(-50%); width: 221px; height: 9px; z-index: 2;"
+                alt="Panel Divider" />
+            <img src="assets/svg/panel_apps/search.svg"
+                style="position: absolute; top: 80px; left: 50%; transform: translateX(-50%); width: 250px; height: 20px; z-index: 2;"
+                alt="Search Bar" />
+        </div>
+    </div>
 
-                const dayName = days[now.getDay()];
-                const monthName = months[now.getMonth()];
-                const dayNum = now.getDate();
-                let hours = now.getHours();
-                const minutes = now.getMinutes().toString().padStart(2, '0');
-                const ampm = hours >= 12 ? 'PM' : 'AM';
-                hours = hours % 12 || 12;
+    <script>
+        const updateClock = () => {
+            const clockEl = document.getElementById('menu-bar-reloj-text');
+            if (!clockEl) return;
+            const now = new Date();
+            // Format: Lun 10 Feb 16:48
+            const options = { weekday: 'short', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false };
+            let timeStr = now.toLocaleString('es-ES', options);
+            timeStr = timeStr.replace(',', '').replace('.', '');
+            clockEl.textContent = timeStr;
+        };
+        setInterval(updateClock, 1000);
+        updateClock();
 
-                const clockStr = `${dayName} ${monthName} ${dayNum}  ${hours}:${minutes} ${ampm}`;
-                const clockEl = document.getElementById('menu-bar-clock');
-                if (clockEl) clockEl.textContent = clockStr;
-            };
-            setInterval(updateClock, 1000);
-            updateClock();
+        const container = document.getElementById('main-container');
+        const trigger = document.getElementById('panel-trigger');
+        const splitTrigger = document.getElementById('splitview-trigger');
+        const homeTrigger = document.getElementById('home-trigger');
+        const maskFull = document.getElementById('mask-full');
+        const leftPaneMask = document.getElementById('pane-left-mask-path');
+        const rightPaneMask = document.getElementById('pane-right-mask-path');
+        const canvasPath = document.getElementById('main-canvas-path');
+        const dockElements = document.getElementById('dock-elements');
+        const splitDivider = document.getElementById('splitview-divider');
+        const wrapper = container.querySelector('.main-canvas-wrapper');
+        const taskPanelPath = document.getElementById('task-panel-path');
+        const overlaySvg = document.querySelector('.canvas-overlay-svg');
+        const panesContainer = document.querySelector('.panes-container');
+        const maskSplitGroup = document.getElementById('mask-split-group');
+        const zipperRectSplit = document.getElementById('zipper-rect-split');
+        const zipperRectFull = document.getElementById('zipper-rect-full');
 
-            const container = document.getElementById('main-container');
-            const trigger = document.getElementById('panel-trigger');
-            const splitTrigger = document.getElementById('splitview-trigger');
-            const maskFull = document.getElementById('mask-full');
-            const leftPaneMask = document.getElementById('pane-left-mask-path');
-            const rightPaneMask = document.getElementById('pane-right-mask-path');
-            const canvasPath = document.getElementById('main-canvas-path');
-            const dockElements = document.getElementById('dock-elements');
-            const splitDivider = document.getElementById('splitview-divider');
-            const wrapper = container.querySelector('.main-canvas-wrapper');
-            const taskPanelPath = document.getElementById('task-panel-path');
-            const overlaySvg = document.querySelector('.canvas-overlay-svg');
-            const panesContainer = document.querySelector('.panes-container');
-            const maskSplitGroup = document.getElementById('mask-split-group');
-            const zipperRectSplit = document.getElementById('zipper-rect-split');
-            const zipperRectFull = document.getElementById('zipper-rect-full');
+        let splitRatio = 1.0;
+        let viewMode = 'single-left';
 
-            let splitRatio = 1.0;
-            let viewMode = 'single-left';
+        let dockState = 'closed';
+        let cachedW = 0, cachedH = 0;
+        let lastPaths = { fullD: '', leftD: '', rightD: '', taskD: '', splitX: -1, splitRatio: -1 };
+        let isLooping = false;
+        let isDragging = false;
+        let splitRatioAnimationActive = false;
 
-            let dockState = 'closed';
-            let cachedW = 0, cachedH = 0;
-            let lastPaths = { fullD: '', leftD: '', rightD: '', taskD: '', splitX: -1, splitRatio: -1 };
-            let isLooping = false;
-            let isDragging = false;
-            let splitRatioAnimationActive = false;
+        const MODERN_UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36";
 
-            const MODERN_UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36";
+        const K_CENTER = 0.05;
+        const K_LATERAL = 0.025;
+        const DAMPING = 0.35;
+        const DT = 1.0;
 
-            const K_CENTER = 0.05;
-            const K_LATERAL = 0.025;
-            const DAMPING = 0.35;
-            const DT = 1.0;
+        const particles = {
+            dL: { x: 0, y: 700, py: 700, k: K_LATERAL, ty: 0 },
+            dR: { x: 0, y: 700, py: 700, k: K_LATERAL, ty: 0 },
+            dC1: { x: 0, y: 700, py: 700, k: K_LATERAL * 1.5, ty: 0 },
+            dC2: { x: 0, y: 700, py: 700, k: K_CENTER, ty: 0 },
+            dC3: { x: 0, y: 700, py: 700, k: K_CENTER, ty: 0 },
+            dC4: { x: 0, y: 700, py: 700, k: K_LATERAL * 1.5, ty: 0 }
+        };
 
-            const particles = {
-                dL: { x: 0, y: 700, py: 700, k: K_LATERAL, ty: 0 },
-                dR: { x: 0, y: 700, py: 700, k: K_LATERAL, ty: 0 },
-                dC1: { x: 0, y: 700, py: 700, k: K_LATERAL * 1.5, ty: 0 },
-                dC2: { x: 0, y: 700, py: 700, k: K_CENTER, ty: 0 },
-                dC3: { x: 0, y: 700, py: 700, k: K_CENTER, ty: 0 },
-                dC4: { x: 0, y: 700, py: 700, k: K_LATERAL * 1.5, ty: 0 }
-            };
+        const initParticles = (w, h) => {
+            cachedW = w; cachedH = h;
+            const bottom = h - 1;
+            const dockTop = h - 26;
+            particles.dL.y = particles.dL.py = bottom; particles.dL.ty = bottom;
+            particles.dR.y = particles.dR.py = bottom; particles.dR.ty = bottom;
+            particles.dC1.y = particles.dC1.py = bottom; particles.dC1.ty = bottom;
+            particles.dC2.y = particles.dC2.py = bottom; particles.dC2.ty = dockTop;
+            particles.dC3.y = particles.dC3.py = bottom; particles.dC3.ty = dockTop;
+            particles.dC4.y = particles.dC4.py = bottom; particles.dC4.ty = bottom;
+            startLoop();
+        };
 
-            const initParticles = (w, h) => {
-                cachedW = w; cachedH = h;
-                const bottom = h - 1;
-                const dockTop = h - 26;
-                particles.dL.y = particles.dL.py = bottom; particles.dL.ty = bottom;
-                particles.dR.y = particles.dR.py = bottom; particles.dR.ty = bottom;
-                particles.dC1.y = particles.dC1.py = bottom; particles.dC1.ty = bottom;
-                particles.dC2.y = particles.dC2.py = bottom; particles.dC2.ty = dockTop;
-                particles.dC3.y = particles.dC3.py = bottom; particles.dC3.ty = dockTop;
-                particles.dC4.y = particles.dC4.py = bottom; particles.dC4.ty = bottom;
-                startLoop();
-            };
+        const updatePhysics = (h) => {
+            if (!h) return false;
+            const bottom = h - 1;
+            const isClosed = (dockState === 'closed');
+            let moving = false;
+            const progress = (bottom - particles.dC2.y) / 25;
+            const centerVis = Math.max(0, (progress - 0.82) / 0.18);
+            const edgeVis = Math.max(0, (progress - 0.95) / 0.05);
+            const icons = dockElements.querySelectorAll('.dock-icon');
+            const lines = dockElements.querySelectorAll('line');
+            icons.forEach((icon, idx) => {
+                const isCenter = (idx === 1);
+                const v = isCenter ? centerVis : edgeVis;
+                icon.style.opacity = Math.pow(v, 2);
+            });
+            lines.forEach(line => { line.style.opacity = Math.pow(edgeVis, 2); });
+            for (let key in particles) {
+                const p = particles[key];
+                const targetY = isClosed ? bottom : p.ty;
+                const force = (targetY - p.y) * p.k;
+                const velocity = (p.y - p.py) * DAMPING;
+                const nextY = p.y + velocity + force * (DT * DT);
+                if (Math.abs(nextY - p.y) > 0.001 || Math.abs(targetY - nextY) > 0.001) moving = true;
+                p.py = p.y; p.y = nextY;
+            }
+            return moving;
+        };
 
-            const updatePhysics = (h) => {
-                if (!h) return false;
-                const bottom = h - 1;
-                const isClosed = (dockState === 'closed');
-                let moving = false;
-                const progress = (bottom - particles.dC2.y) / 25;
-                const centerVis = Math.max(0, (progress - 0.82) / 0.18);
-                const edgeVis = Math.max(0, (progress - 0.95) / 0.05);
-                const icons = dockElements.querySelectorAll('.dock-icon');
-                const lines = dockElements.querySelectorAll('line');
-                icons.forEach((icon, idx) => {
-                    const isCenter = (idx === 1);
-                    const v = isCenter ? centerVis : edgeVis;
-                    icon.style.opacity = Math.pow(v, 2);
-                    icon.style.pointerEvents = (v > 0.5) ? 'auto' : 'none';
+        const updateToolbarStatus = () => {
+            const toolbar = document.getElementById('menu-bar-toolbar');
+            if (!toolbar) return;
+            if (splitRatio < 0.99 || tabs.length > 0) {
+                toolbar.style.opacity = '1';
+                toolbar.style.pointerEvents = 'auto';
+            } else {
+                toolbar.style.opacity = '0';
+                toolbar.style.pointerEvents = 'none';
+            }
+        };
+
+        const updateGeometry = () => {
+            const w = cachedW; const h = cachedH;
+            if (!w || !h) return;
+            const svg = canvasPath.closest('svg');
+            const viewBoxStr = `0 0 ${w} ${h}`;
+            if (svg.getAttribute('viewBox') !== viewBoxStr) {
+                svg.setAttribute('viewBox', viewBoxStr);
+                overlaySvg.setAttribute('viewBox', viewBoxStr);
+            }
+            const L = 0, R = w, rad = 10, bottom = h - 1;
+            let splitX = Math.round(w * splitRatio);
+            splitX = Math.max(0, Math.min(w, splitX));
+            const p = particles; const dockCenter = Math.round(w / 2);
+            p.dL.x = dockCenter - 121; p.dR.x = dockCenter + 119;
+            p.dC1.x = dockCenter - 96; p.dC2.x = dockCenter - 71;
+            p.dC3.x = dockCenter + 69; p.dC4.x = dockCenter + 94;
+            const fullD = `M ${L + rad} 1 H ${R - rad} Q ${R} 1 ${R} ${1 + rad} V ${bottom - rad} Q ${R} ${bottom} ${R - rad} ${bottom} H ${p.dR.x} C ${p.dC4.x} ${bottom} ${p.dC4.x} ${p.dC3.y} ${p.dC3.x} ${p.dC3.y} H ${p.dC2.x} C ${p.dC1.x} ${p.dC2.y} ${p.dC1.x} ${bottom} ${p.dL.x} ${bottom} H ${L + rad} Q ${L} ${bottom} ${L} ${bottom - rad} V ${1 + rad} Q ${L} 1 ${L + rad} 1 Z`;
+            const leftD = `M ${L + rad} 1 H ${splitX - 2 - rad} Q ${splitX - 2} 1 ${splitX - 2} ${1 + rad} V ${p.dC2.y} H ${p.dC2.x} C ${p.dC1.x} ${p.dC2.y} ${p.dC1.x} ${bottom} ${p.dL.x} ${bottom} H ${L + rad} Q ${L} ${bottom} ${L} ${bottom - rad} V ${1 + rad} Q ${L} 1 ${L + rad} 1 Z`;
+            const rightD = `M ${splitX + 2 + rad} 1 H ${R - rad} Q ${R} 1 ${R} ${1 + rad} V ${bottom - rad} Q ${R} ${bottom} ${R - rad} ${bottom} H ${p.dR.x} C ${p.dC4.x} ${bottom} ${p.dC4.x} ${p.dC3.y} ${p.dC3.x} ${p.dC3.y} H ${splitX + 2} V ${1 + rad} Q ${splitX + 2} 1 ${splitX + 2 + rad} 1 Z`;
+            if (fullD !== lastPaths.fullD) { canvasPath.setAttribute('d', fullD); maskFull.setAttribute('d', fullD); lastPaths.fullD = fullD; }
+            if (leftD !== lastPaths.leftD) { leftPaneMask.setAttribute('d', leftD); lastPaths.leftD = leftD; }
+            if (rightD !== lastPaths.rightD) { rightPaneMask.setAttribute('d', rightD); lastPaths.rightD = rightD; }
+            const taskWrapper = container.querySelector('.task-panel-wrapper');
+            if (taskWrapper.offsetWidth > 1) {
+                const taskH = taskWrapper.offsetHeight || 663;
+                const taskW = 300, taskRad = 10, taskBottom = taskH - 1;
+                const taskD = `M 0 ${taskBottom - taskRad} V ${taskRad} Q 0 1 ${taskRad} 1 H ${taskW - taskRad} Q ${taskW} 1 ${taskW} ${taskRad} V ${taskBottom - taskRad} Q ${taskW} ${taskBottom} ${taskW - taskRad} ${taskBottom} H ${taskRad} Q 0 ${taskBottom} 0 ${taskBottom - taskRad} Z`;
+                if (taskPanelPath && taskD !== lastPaths.taskD) { taskPanelPath.setAttribute('d', taskD); lastPaths.taskD = taskD; }
+            }
+            dockElements.setAttribute('transform', `translate(${dockCenter - 618}, ${h - 653.5})`);
+            splitDivider.style.transform = `translate(${splitX - 2}px, 0)`;
+            if (splitRatio !== lastPaths.splitRatio || splitX !== lastPaths.splitX) {
+                if (splitRatio >= 0.99) { panesContainer.style.gridTemplateColumns = `1fr 0px 0px`; splitDivider.style.display = 'none'; }
+                else if (splitRatio <= 0.01) { panesContainer.style.gridTemplateColumns = `0px 0px 1fr`; splitDivider.style.display = 'none'; }
+                else { panesContainer.style.gridTemplateColumns = `${splitX - 2}px 4px ${w - splitX - 2}px`; splitDivider.style.display = 'block'; }
+                const maskFullGrp = document.getElementById('mask-full-group');
+                const maskSplitGrp = document.getElementById('mask-split-group');
+                if (splitRatio > 0.99 || splitRatio < 0.01) { maskFullGrp.style.display = 'block'; maskSplitGrp.style.display = 'none'; }
+                else { maskFullGrp.style.display = 'none'; maskSplitGrp.style.display = 'block'; }
+                lastPaths.splitRatio = splitRatio; lastPaths.splitX = splitX;
+            }
+            updateToolbarStatus();
+            zipperRectSplit.setAttribute('height', '100%'); zipperRectFull.setAttribute('height', '100%');
+            zipperRectFull.setAttribute('y', '0'); canvasPath.setAttribute('mask', 'url(#split-mask)');
+        };
+
+        const animate = () => {
+            const moving = updatePhysics(cachedH);
+            updateGeometry();
+            if (moving || splitRatioAnimationActive || isDragging) { requestAnimationFrame(animate); }
+            else { isLooping = false; }
+        };
+
+        const startLoop = () => { if (!isLooping) { isLooping = true; requestAnimationFrame(animate); } };
+
+        const onResize = () => {
+            const rect = wrapper.getBoundingClientRect();
+            cachedW = rect.width; cachedH = rect.height;
+            updateGeometry(); startLoop();
+        };
+        const rObs = new ResizeObserver(onResize);
+        rObs.observe(wrapper); rObs.observe(container.querySelector('.task-panel-wrapper'));
+
+        const hitArea = document.getElementById('dock-hit-area');
+        const backdrop = document.getElementById('dock-backdrop');
+        hitArea.addEventListener('mouseenter', () => setDockState('open'));
+        backdrop.addEventListener('mousedown', () => setDockState('closed'));
+
+        window.addEventListener('load', () => {
+            const rect = wrapper.getBoundingClientRect();
+            cachedW = rect.width; cachedH = rect.height;
+            initParticles(cachedW, cachedH);
+            populateAppGrid();
+        });
+
+        const apps = [
+            { name: 'Gmail', file: 'gmail.svg', url: 'https://mail.google.com' },
+            { name: 'Google', file: 'google.svg', url: 'https://google.com' },
+            { name: 'WhatsApp', file: 'Whatsapp.svg', url: 'https://web.whatsapp.com' },
+            { name: 'Drive', file: 'drive.svg', url: 'https://drive.google.com' },
+            { name: 'Add', file: 'añadir.svg', url: 'action:add' }
+        ];
+
+        const populateAppGrid = () => {
+            const grid = document.createElement('div');
+            grid.className = 'app-grid';
+            apps.forEach(app => {
+                const img = document.createElement('img');
+                img.src = `assets/svg/panel_apps/iconos_app/${app.file}`;
+                img.className = 'app-icon'; img.alt = app.name;
+                img.addEventListener('click', () => {
+                    if (app.url === 'action:add') console.log('Open Add Modal');
+                    else openUrlInSplit(app.url);
                 });
-                lines.forEach(line => { line.style.opacity = Math.pow(edgeVis, 2); });
-                for (let key in particles) {
-                    const p = particles[key];
-                    const targetY = isClosed ? bottom : p.ty;
-                    const force = (targetY - p.y) * p.k;
-                    const velocity = (p.y - p.py) * DAMPING;
-                    const nextY = p.y + velocity + force * (DT * DT);
-                    if (Math.abs(nextY - p.y) > 0.001 || Math.abs(targetY - nextY) > 0.001) moving = true;
-                    p.py = p.y; p.y = nextY;
-                }
-                return moving;
-            };
-
-            const updateGeometry = () => {
-                const w = cachedW; const h = cachedH;
-                if (!w || !h) return;
-                const svg = canvasPath.closest('svg');
-                const viewBoxStr = `0 0 ${w} ${h}`;
-                if (svg.getAttribute('viewBox') !== viewBoxStr) {
-                    svg.setAttribute('viewBox', viewBoxStr);
-                    overlaySvg.setAttribute('viewBox', viewBoxStr);
-                }
-                const L = 0, R = w, rad = 10, bottom = h - 1;
-                let splitX = Math.round(w * splitRatio);
-                splitX = Math.max(0, Math.min(w, splitX));
-                const p = particles; const dockCenter = Math.round(w / 2);
-                p.dL.x = dockCenter - 121; p.dR.x = dockCenter + 119;
-                p.dC1.x = dockCenter - 96; p.dC2.x = dockCenter - 71;
-                p.dC3.x = dockCenter + 69; p.dC4.x = dockCenter + 94;
-                const fullD = `M ${L + rad} 1 H ${R - rad} Q ${R} 1 ${R} ${1 + rad} V ${bottom - rad} Q ${R} ${bottom} ${R - rad} ${bottom} H ${p.dR.x} C ${p.dC4.x} ${bottom} ${p.dC4.x} ${p.dC3.y} ${p.dC3.x} ${p.dC3.y} H ${p.dC2.x} C ${p.dC1.x} ${p.dC2.y} ${p.dC1.x} ${bottom} ${p.dL.x} ${bottom} H ${L + rad} Q ${L} ${bottom} ${L} ${bottom - rad} V ${1 + rad} Q ${L} 1 ${L + rad} 1 Z`;
-                const leftD = `M ${L + rad} 1 H ${splitX - 2 - rad} Q ${splitX - 2} 1 ${splitX - 2} ${1 + rad} V ${p.dC2.y} H ${p.dC2.x} C ${p.dC1.x} ${p.dC2.y} ${p.dC1.x} ${bottom} ${p.dL.x} ${bottom} H ${L + rad} Q ${L} ${bottom} ${L} ${bottom - rad} V ${1 + rad} Q ${L} 1 ${L + rad} 1 Z`;
-                const rightD = `M ${splitX + 2 + rad} 1 H ${R - rad} Q ${R} 1 ${R} ${1 + rad} V ${bottom - rad} Q ${R} ${bottom} ${R - rad} ${bottom} H ${p.dR.x} C ${p.dC4.x} ${bottom} ${p.dC4.x} ${p.dC3.y} ${p.dC3.x} ${p.dC3.y} H ${splitX + 2} V ${1 + rad} Q ${splitX + 2} 1 ${splitX + 2 + rad} 1 Z`;
-                if (fullD !== lastPaths.fullD) { canvasPath.setAttribute('d', fullD); maskFull.setAttribute('d', fullD); lastPaths.fullD = fullD; }
-                if (leftD !== lastPaths.leftD) { leftPaneMask.setAttribute('d', leftD); lastPaths.leftD = leftD; }
-                if (rightD !== lastPaths.rightD) { rightPaneMask.setAttribute('d', rightD); lastPaths.rightD = rightD; }
-                const taskWrapper = container.querySelector('.task-panel-wrapper');
-                if (taskWrapper.offsetWidth > 1) {
-                    const taskH = taskWrapper.offsetHeight || 663;
-                    const taskW = 300, taskRad = 10, taskBottom = taskH - 1;
-                    const taskD = `M 0 ${taskBottom - taskRad} V ${taskRad} Q 0 1 ${taskRad} 1 H ${taskW - taskRad} Q ${taskW} 1 ${taskW} ${taskRad} V ${taskBottom - taskRad} Q ${taskW} ${taskBottom} ${taskW - taskRad} ${taskBottom} H ${taskRad} Q 0 ${taskBottom} 0 ${taskBottom - taskRad} Z`;
-                    if (taskPanelPath && taskD !== lastPaths.taskD) { taskPanelPath.setAttribute('d', taskD); lastPaths.taskD = taskD; }
-                }
-                dockElements.setAttribute('transform', `translate(${dockCenter - 618}, ${h - 656.5})`);
-                splitDivider.style.transform = `translate(${splitX - 2}px, 0)`;
-                if (splitRatio !== lastPaths.splitRatio || splitX !== lastPaths.splitX) {
-                    if (splitRatio >= 0.99) { panesContainer.style.gridTemplateColumns = `1fr 0px 0px`; splitDivider.style.display = 'none'; }
-                    else if (splitRatio <= 0.01) { panesContainer.style.gridTemplateColumns = `0px 0px 1fr`; splitDivider.style.display = 'none'; }
-                    else { panesContainer.style.gridTemplateColumns = `${splitX - 2}px 4px ${w - splitX - 2}px`; splitDivider.style.display = 'block'; }
-                    const maskFullGrp = document.getElementById('mask-full-group');
-                    const maskSplitGrp = document.getElementById('mask-split-group');
-                    if (splitRatio > 0.99 || splitRatio < 0.01) { maskFullGrp.style.display = 'block'; maskSplitGrp.style.display = 'none'; }
-                    else { maskFullGrp.style.display = 'none'; maskSplitGrp.style.display = 'block'; }
-                    lastPaths.splitRatio = splitRatio; lastPaths.splitX = splitX;
-                }
-                zipperRectSplit.setAttribute('height', '100%'); zipperRectFull.setAttribute('height', '100%');
-                zipperRectFull.setAttribute('y', '0'); canvasPath.setAttribute('mask', 'url(#split-mask)');
-            };
-
-            const animate = () => {
-                const moving = updatePhysics(cachedH);
-                updateGeometry();
-                if (moving || splitRatioAnimationActive || isDragging) { requestAnimationFrame(animate); }
-                else { isLooping = false; }
-            };
-
-            const startLoop = () => { if (!isLooping) { isLooping = true; requestAnimationFrame(animate); } };
-
-            const onResize = () => {
-                const rect = wrapper.getBoundingClientRect();
-                cachedW = rect.width; cachedH = rect.height;
-                updateGeometry(); startLoop();
-            };
-            const rObs = new ResizeObserver(onResize);
-            rObs.observe(wrapper); rObs.observe(container.querySelector('.task-panel-wrapper'));
-
-            const hitArea = document.getElementById('dock-hit-area');
-            const backdrop = document.getElementById('dock-backdrop');
-            hitArea.addEventListener('mouseenter', () => {
-                if (dockState === 'closed') {
-                    dockState = 'open'; hitArea.style.pointerEvents = 'none';
-                    backdrop.style.display = 'block'; startLoop();
-                }
+                grid.appendChild(img);
             });
+            document.querySelector('.task-panel-wrapper').appendChild(grid);
+        };
 
-            backdrop.addEventListener('mousedown', () => {
-                dockState = 'closed'; backdrop.style.display = 'none';
-                setTimeout(() => { hitArea.style.pointerEvents = 'auto'; }, 500);
-                startLoop();
-            });
+        let tabs = [];
+        let activeTabId = null;
 
-            window.addEventListener('load', () => {
-                const rect = wrapper.getBoundingClientRect();
-                cachedW = rect.width; cachedH = rect.height;
-                initParticles(cachedW, cachedH);
-                populateAppGrid();
-            });
+        const setDockState = (state) => {
+            dockState = state;
+            const hit = document.getElementById('dock-hit-area');
+            const back = document.getElementById('dock-backdrop');
 
-            const apps = [
-                { name: 'Gmail', file: 'gmail.svg', url: 'https://mail.google.com' },
-                { name: 'Google', file: 'google.svg', url: 'https://google.com' },
-                { name: 'WhatsApp', file: 'Whatsapp.svg', url: 'https://web.whatsapp.com' },
-                { name: 'Drive', file: 'drive.svg', url: 'https://drive.google.com' },
-                { name: 'Add', file: 'añadir.svg', url: 'action:add' }
-            ];
+            document.body.classList.toggle('dock-open', state === 'open');
 
-            const populateAppGrid = () => {
-                const grid = document.createElement('div');
-                grid.className = 'app-grid';
-                apps.forEach(app => {
-                    const img = document.createElement('img');
-                    img.src = `assets/svg/panel_apps/iconos_app/${app.file}`;
-                    img.className = 'app-icon'; img.alt = app.name;
-                    img.addEventListener('click', () => {
-                        if (app.url === 'action:add') console.log('Open Add Modal');
-                        else openUrlInSplit(app.url);
-                    });
-                    grid.appendChild(img);
-                });
-                document.querySelector('.task-panel-wrapper').appendChild(grid);
-            };
+            if (state === 'open') {
+                if (hit) hit.style.pointerEvents = 'none';
+                if (back) back.style.display = 'block';
+            } else {
+                if (back) back.style.display = 'none';
+                setTimeout(() => { if (hit) hit.style.pointerEvents = 'auto'; }, 500);
+            }
+            startLoop();
+        };
 
-            const openUrlInSplit = (url) => {
-                if (dockState === 'closed') {
-                    dockState = 'open';
-                    startLoop(); // Ensure dock reflects state
-                }
+        const openUrlInSplit = (url, browserMode = false) => {
+            setDockState('closed');
 
-                const rightPane = document.getElementById('pane-right');
-                rightPane.innerHTML = `<webview id="wv-right" src="${url}" style="width:100%; height:100%;" allowpopups useragent="${MODERN_UA}"></webview>`;
-
+            if (browserMode) {
+                animateSplitRatio(0);
+            } else {
                 if (splitRatio > 0.9) {
                     animateSplitRatio(0.5);
                 } else {
                     updateViewModeState();
                     startLoop();
                 }
+            }
+        };
+
+        const addNewTab = (url) => {
+            const tabId = 'tab-' + Date.now();
+            const tab = {
+                id: tabId,
+                url: url,
+                title: 'New Tab'
             };
+            tabs.push(tab);
 
-            const animateSplitRatio = (targetRatio) => {
-                splitRatioAnimationActive = true;
-                const duration = 1200; // Even slower for smoother feel
-                const startTime = performance.now();
-                const startRatio = splitRatio;
-                startLoop();
+            const container = document.getElementById('tabs-container');
+            const addBtn = document.getElementById('add-tab-trigger');
+            const tabEl = document.createElement('div');
+            tabEl.id = tabId;
+            tabEl.className = 'menu-tab';
+            tabEl.innerHTML = `
+                    <div class="tab-icon-container">
+                        <img class="tab-icon" src="" />
+                    </div>
+                    <span class="tab-title">Google</span>
+                    <span class="tab-close" onclick="closeTab(event, '${tabId}')">×</span>
+                `;
+            tabEl.onclick = () => switchTab(tabId);
 
-                // Trigger states early
-                const root = document.getElementById('window-root');
-                const tbSvg = document.getElementById('panel-toolbar');
-                if (targetRatio < 0.9) {
-                    if (root) root.classList.add('splitview-active');
-                    if (tbSvg) {
-                        tbSvg.classList.remove('active');
-                        void tbSvg.offsetWidth;
-                        tbSvg.classList.add('active');
-                    }
+            // Insert tab before the "+" button
+            container.insertBefore(tabEl, addBtn);
+
+            const rightPane = document.getElementById('pane-right');
+            const wvContainer = document.createElement('div');
+            wvContainer.id = 'wv-container-' + tabId;
+            wvContainer.className = 'webview-container';
+            wvContainer.innerHTML = `<webview id="wv-${tabId}" src="${url}" style="width:100%; height:100%;" allowpopups useragent="${MODERN_UA}"></webview>`;
+            rightPane.appendChild(wvContainer);
+
+            const wv = document.getElementById(`wv-${tabId}`);
+
+            // Clear state when navigation starts
+            wv.addEventListener('did-start-navigation', () => {
+                const titleEl = tabEl.querySelector('.tab-title');
+                titleEl.textContent = 'Loading...';
+            });
+
+            wv.addEventListener('page-favicon-updated', (e) => {
+                if (e.favicons && e.favicons.length > 0) {
+                    const iconEl = tabEl.querySelector('.tab-icon');
+                    iconEl.src = e.favicons[0];
+                    iconEl.classList.add('has-icon');
                 }
+            });
 
-                const step = (now) => {
-                    const elapsed = now - startTime;
-                    const p = Math.min(elapsed / duration, 1);
-                    const ease = 1 - Math.pow(1 - p, 3);
-                    splitRatio = startRatio + (targetRatio - startRatio) * ease;
-                    if (p < 1) requestAnimationFrame(step);
-                    else {
-                        splitRatio = targetRatio; splitRatioAnimationActive = false;
-                        updateViewModeState();
-                    }
-                };
-                requestAnimationFrame(step);
-            };
+            wv.addEventListener('page-title-updated', (e) => {
+                const titleEl = tabEl.querySelector('.tab-title');
+                titleEl.textContent = e.title;
+                tab.title = e.title;
+            });
 
-            const updateViewModeState = () => {
-                const tbContainer = document.getElementById('toolbar-container');
-                const tbSvg = document.getElementById('panel-toolbar');
-                const root = document.getElementById('window-root');
-
-                // Toolbar logic removed as per user request to replace with Menu Bar
-                if (splitRatio >= 0.99) {
-                    viewMode = 'single-left';
-                    container.classList.remove('splitview-active');
-                    root.classList.remove('splitview-active');
-                    const tbContainer = document.getElementById('toolbar-container');
-                    if (tbContainer) {
-                        tbContainer.classList.remove('active');
-                        setTimeout(() => {
-                            if (!tbContainer.classList.contains('active')) {
-                                tbContainer.style.display = 'none';
-                            }
-                        }, 300);
-                    }
+            // Fallback for title if event doesn't fire early enough
+            wv.addEventListener('did-stop-loading', () => {
+                const title = wv.getTitle();
+                if (title && title !== 'Loading...') {
+                    const titleEl = tabEl.querySelector('.tab-title');
+                    titleEl.textContent = title;
+                    tab.title = title;
                 }
+            });
+
+            switchTab(tabId);
+            openUrlInSplit(url, true);
+            updateToolbarStatus();
+        };
+
+        const switchTab = (tabId) => {
+            if (activeTabId === tabId) return;
+
+            document.querySelectorAll('.menu-tab').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.webview-container').forEach(el => el.classList.remove('active'));
+
+            const tabEl = document.getElementById(tabId);
+            const wvContainer = document.getElementById('wv-container-' + tabId);
+
+            if (tabEl) tabEl.classList.add('active');
+            if (wvContainer) wvContainer.classList.add('active');
+
+            activeTabId = tabId;
+            animateSplitRatio(0);
+        };
+
+        const closeTab = (event, tabId) => {
+            event.stopPropagation();
+            tabs = tabs.filter(t => t.id !== tabId);
+
+            const tabEl = document.getElementById(tabId);
+            const wvContainer = document.getElementById('wv-container-' + tabId);
+
+            if (tabEl) tabEl.remove();
+            if (wvContainer) wvContainer.remove();
+
+            if (activeTabId === tabId) {
+                if (tabs.length > 0) {
+                    switchTab(tabs[tabs.length - 1].id);
+                } else {
+                    switchToMainApp();
+                }
+            }
+            updateToolbarStatus();
+        };
+
+        const updateAddButtonPosition = () => {
+            const addBtn = document.getElementById('add-tab-trigger');
+            const container = document.getElementById('tabs-container');
+            const offset = container.offsetWidth;
+            addBtn.style.left = (105 + offset + (tabs.length > 0 ? 30 : 0)) + 'px';
+        };
+
+        const switchToMainApp = () => {
+            activeTabId = null;
+            document.querySelectorAll('.menu-tab').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.webview-container').forEach(el => el.classList.remove('active'));
+            animateSplitRatio(1);
+        };
+
+        const animateSplitRatio = (targetRatio) => {
+            splitRatioAnimationActive = true;
+            const duration = 1200; // Even slower for smoother feel
+            const startTime = performance.now();
+            const startRatio = splitRatio;
+            startLoop();
+
+            // Trigger states early
+            const root = document.getElementById('window-root');
+            const tbSvg = document.getElementById('panel-toolbar');
+            if (targetRatio < 0.9) {
+                if (root) root.classList.add('splitview-active');
+                if (tbSvg) {
+                    tbSvg.classList.remove('active');
+                    void tbSvg.offsetWidth;
+                    tbSvg.classList.add('active');
+                }
+            }
+
+            const step = (now) => {
+                const elapsed = now - startTime;
+                const p = Math.min(elapsed / duration, 1);
+                const ease = 1 - Math.pow(1 - p, 3);
+                splitRatio = startRatio + (targetRatio - startRatio) * ease;
+                if (p < 1) requestAnimationFrame(step);
                 else {
-                    viewMode = splitRatio <= 0.01 ? 'single-right' : 'split';
-                    container.classList.add('splitview-active');
-                    root.classList.add('splitview-active');
-
-                    const tbContainer = document.getElementById('toolbar-container');
-                    if (tbContainer) {
-                        tbContainer.style.display = 'flex';
-                        // Force reflow
-                        tbContainer.offsetHeight;
-                        tbContainer.classList.add('active');
-                    }
+                    splitRatio = targetRatio; splitRatioAnimationActive = false;
+                    updateViewModeState();
                 }
             };
+            requestAnimationFrame(step);
+        };
 
-            const onMouseMove = (e) => {
-                if (!isDragging) return;
-                const rect = wrapper.getBoundingClientRect();
-                let x = e.clientX - rect.left;
-                if (x < 30) x = 0; if (x > rect.width - 30) x = rect.width;
-                splitRatio = x / rect.width;
-            };
+        const updateViewModeState = () => {
+            const tbContainer = document.getElementById('toolbar-container');
+            const tbSvg = document.getElementById('panel-toolbar');
+            const root = document.getElementById('window-root');
 
-            const onMouseUp = () => {
-                isDragging = false; document.body.classList.remove('is-resizing');
-                window.removeEventListener('mousemove', onMouseMove);
-                window.removeEventListener('mouseup', onMouseUp);
-                updateViewModeState(); startLoop();
-            };
-
-            splitDivider.addEventListener('mousedown', (e) => {
-                isDragging = true; document.body.classList.add('is-resizing');
-                window.addEventListener('mousemove', onMouseMove);
-                window.addEventListener('mouseup', onMouseUp);
-                startLoop(); e.preventDefault();
-            });
-
-            const wvLeft = document.getElementById('wv-left');
-            wvLeft.addEventListener('did-finish-load', () => console.log('Main webview loaded'));
-
-            // Restore lost dock listeners
-            trigger.addEventListener('click', () => {
-                container.classList.toggle('container-panel-open');
-            });
-
-            splitTrigger.addEventListener('click', () => {
-                const paneRight = document.getElementById('pane-right');
-                if (!document.getElementById('wv-right')) {
-                    const wv = document.createElement('webview');
-                    wv.id = 'wv-right';
-                    wv.src = 'https://google.com'; // Default
-                    wv.setAttribute('allowpopups', '');
-                    wv.setAttribute('useragent', MODERN_UA);
-                    paneRight.appendChild(wv);
+            // Toolbar logic removed as per user request to replace with Menu Bar
+            if (splitRatio >= 0.99) {
+                viewMode = 'single-left';
+                container.classList.remove('splitview-active');
+                root.classList.remove('splitview-active');
+                const tbContainer = document.getElementById('toolbar-container');
+                if (tbContainer) {
+                    tbContainer.classList.remove('active');
+                    setTimeout(() => {
+                        if (!tbContainer.classList.contains('active')) {
+                            tbContainer.style.display = 'none';
+                        }
+                    }, 300);
                 }
-                if (viewMode === 'split') animateSplitRatio(1.0);
-                else animateSplitRatio(0.5);
-            });
+            }
+            else {
+                viewMode = splitRatio <= 0.01 ? 'single-right' : 'split';
+                container.classList.add('splitview-active');
+                root.classList.add('splitview-active');
 
-        </script>
+                const tbContainer = document.getElementById('toolbar-container');
+                if (tbContainer) {
+                    tbContainer.style.display = 'flex';
+                    // Force reflow
+                    tbContainer.offsetHeight;
+                    tbContainer.classList.add('active');
+                }
+            }
+        };
+
+        const onMouseMove = (e) => {
+            if (!isDragging) return;
+            const rect = wrapper.getBoundingClientRect();
+            let x = e.clientX - rect.left;
+            if (x < 30) x = 0; if (x > rect.width - 30) x = rect.width;
+            splitRatio = x / rect.width;
+        };
+
+        const onMouseUp = () => {
+            isDragging = false; document.body.classList.remove('is-resizing');
+            window.removeEventListener('mousemove', onMouseMove);
+            window.removeEventListener('mouseup', onMouseUp);
+            updateViewModeState(); startLoop();
+        };
+
+        splitDivider.addEventListener('mousedown', (e) => {
+            isDragging = true; document.body.classList.add('is-resizing');
+            window.addEventListener('mousemove', onMouseMove);
+            window.addEventListener('mouseup', onMouseUp);
+            startLoop(); e.preventDefault();
+        });
+
+        const wvLeft = document.getElementById('wv-left');
+        wvLeft.addEventListener('did-finish-load', () => console.log('Main webview loaded'));
+
+        // Restore lost dock listeners
+        trigger.addEventListener('click', () => {
+            container.classList.toggle('container-panel-open');
+        });
+
+        splitTrigger.addEventListener('click', () => {
+            const paneRight = document.getElementById('pane-right');
+            if (!document.getElementById('wv-right')) {
+                const wv = document.createElement('webview');
+                wv.id = 'wv-right';
+                wv.src = 'https://google.com'; // Default
+                wv.setAttribute('allowpopups', '');
+                wv.setAttribute('useragent', MODERN_UA);
+                paneRight.appendChild(wv);
+            }
+            if (viewMode === 'split') animateSplitRatio(1.0);
+            else animateSplitRatio(0.5);
+        });
+
+        if (homeTrigger) {
+            homeTrigger.addEventListener('click', () => {
+                const wvLeft = document.getElementById('wv-left');
+                if (wvLeft && wvLeft.src !== 'http://localhost:3001') {
+                    wvLeft.src = 'http://localhost:3001';
+                }
+                switchToMainApp();
+                setDockState('closed');
+            });
+        }
+
+        const getActiveWebview = () => {
+            if (activeTabId) {
+                return document.getElementById(`wv-${activeTabId}`);
+            }
+            return document.getElementById('wv-left');
+        };
+
+        const tSearch = document.getElementById('toolbar-search');
+        const tBack = document.getElementById('toolbar-share'); // Usado como Atrás
+        const tRefresh = document.getElementById('toolbar-refresh');
+        const tForward = document.getElementById('toolbar-action'); // Usado como Adelante
+
+        const searchModal = document.getElementById('search-modal');
+        const searchInput = document.getElementById('search-input');
+
+        if (tSearch) {
+            tSearch.onclick = () => {
+                searchModal.style.display = 'flex';
+                searchInput.value = '';
+                searchInput.focus();
+            };
+        }
+
+        if (searchInput) {
+            searchInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && searchInput.value.trim() !== '') {
+                    const query = encodeURIComponent(searchInput.value.trim());
+                    addNewTab(`https://www.google.com/search?q=${query}`);
+                    searchModal.style.display = 'none';
+                } else if (e.key === 'Escape') {
+                    searchModal.style.display = 'none';
+                }
+            });
+        }
+
+        if (searchModal) {
+            searchModal.addEventListener('click', (e) => {
+                if (e.target === searchModal) {
+                    searchModal.style.display = 'none';
+                }
+            });
+        }
+
+        if (tBack) tBack.onclick = () => {
+            const wv = getActiveWebview();
+            if (wv && wv.canGoBack()) {
+                wv.goBack();
+            } else {
+                console.log('No hay historial para ir atrás');
+            }
+        };
+
+        if (tRefresh) tRefresh.onclick = () => {
+            const wv = getActiveWebview();
+            if (wv) wv.reload();
+        };
+
+        if (tForward) tForward.onclick = () => {
+            const wv = getActiveWebview();
+            if (wv && wv.canGoForward()) {
+                wv.goForward();
+            } else {
+                console.log('No hay historial para ir adelante');
+            }
+        };
+
+    </script>
     </div>
 </body>
 
