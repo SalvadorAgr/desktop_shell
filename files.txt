@@ -1,0 +1,7 @@
+buttons.svg
+content.svg
+iconos_app
+line.svg
+menu bar.svg
+pestañas.svg
+search.svg

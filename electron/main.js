@@ -3,6 +3,14 @@ const path = require('path');
 
 let mainWindow;
 
+// Optimización: Desactivar FIDO/WebAuthn y errores de Bluetooth innecesarios en modo dev
+app.commandLine.appendSwitch('disable-features', 'WebAuthentication,U2fSecurityKeyApi,Bluetooth');
+// Estabilización: Evitar errores de Skia/SharedImageManager en macOS
+app.commandLine.appendSwitch('disable-gpu-rasterization');
+app.commandLine.appendSwitch('disable-software-rasterizer');
+// Supresión de logs innecesarios
+app.commandLine.appendSwitch('log-level', '3');
+
 function createWindow() {
     const isMac = process.platform === 'darwin';
     const isWindows = process.platform === 'win32';
@@ -39,7 +47,7 @@ function createWindow() {
     mainWindow = new BrowserWindow(windowConfig);
 
     // Cargar la aplicación
-    mainWindow.loadFile(path.join(__dirname, '../index.html'));
+    mainWindow.loadFile(path.join(__dirname, '../dist/index.html'));
 
     // Mostrar ventana cuando esté lista
     mainWindow.once('ready-to-show', () => {
